@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">Notes</string>
     <string name="undo">UNDO</string>
+    <string name="cancel_reminder">Cancel Reminder</string>
+    <string name="set_reminder">Set Reminder</string>
+    <string name="pick_time">Pick time</string>
+    <string name="time_not_selected">Time not selected</string>
+    <string name="pick_date">Pick date</string>
+    <string name="date_not_selected">Date not selected</string>
+    <string name="add_reminder">Add Reminder</string>
+    <string name="priority">Priority:</string>
+    <string name="description">Description</string>
+    <string name="title">Title</string>
 </resources>

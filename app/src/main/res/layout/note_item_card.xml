@@ -13,15 +13,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp">
-        <TextView
-            android:id="@+id/text_view_priority"
+        <ImageView
+            android:id="@+id/notification_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:src="@drawable/ic_notifications_active"
             android:layout_alignParentEnd="true"
-            android:padding="8dp"
-            android:text="1"
-            android:textColor="@color/colorSecondary"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
+            android:padding="20dp" />
         <TextView
             android:id="@+id/text_view_title"
             android:layout_width="wrap_content"
@@ -29,7 +27,7 @@
             android:text="Title"
             android:padding="5dp"
             android:maxLines="1"
-            android:layout_toStartOf="@+id/text_view_priority"
+            android:layout_toStartOf="@+id/notification_icon"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:layout_alignParentStart="true"
             android:ellipsize="end"/>

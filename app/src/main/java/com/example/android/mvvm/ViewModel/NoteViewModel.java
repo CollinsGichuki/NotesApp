@@ -16,6 +16,7 @@ import java.util.List;
 public class NoteViewModel extends AndroidViewModel {
     private NoteRepository repository;
     private LiveData<List<Note>> allNotes;
+    private long noteId;
 
     //Pass the context(Application thru to the repository to instantiate the database
     public NoteViewModel(@NonNull Application application) {
@@ -30,8 +31,9 @@ public class NoteViewModel extends AndroidViewModel {
     The ViewModel gets the data from the Repository class using
     rubber methods for the database operations methods from the Repository class
     */
-    public void insert(Note note) {
-        repository.insert(note);
+    public long insert(Note note) {
+        noteId = repository.insert(note);
+        return noteId;
     }
 
     public void update(Note note) {

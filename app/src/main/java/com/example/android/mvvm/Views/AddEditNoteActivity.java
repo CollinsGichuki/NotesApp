@@ -1,15 +1,10 @@
 package com.example.android.mvvm.Views;
 
-import android.app.AlarmManager;
 import android.app.DatePickerDialog;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,45 +12,52 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.android.mvvm.AlertReceiver;
 import com.example.android.mvvm.R;
 import com.example.android.mvvm.Reminder.DatePickerFragment;
 import com.example.android.mvvm.Reminder.TimePickerFragment;
 import com.muddzdev.styleabletoast.StyleableToast;
 
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
-import static com.example.android.mvvm.Notifications.App.CHANNEL_1_ID;
 
 public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBottomSheetDialog.BottomSheetListener, TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
     public static final String EXTRA_ID = "com.example.android.mvvm.EXTRA_ID";
     public static final String EXTRA_TITLE = "com.example.android.mvvm.EXTRA_TITLE";
     public static final String EXTRA_DESCRIPTION = "com.example.android.mvvm.EXTRA_DESCRIPTION";
-    public static final String EXTRA_PRIORITY = "com.example.android.mvvm.EXTRA_PRIORITY";
-    //For the notifications
-    private NotificationManagerCompat fNotificationManagerCompat;
+    public static final String EXTRA_REMINDER_BOOLEAN = "com.example.android.mvvm.EXTRA_REMINDER_BOOLEAN";
+    public static final String EXTRA_DATE = "com.example.android.mvvm.EXTRA_REMINDER_DATE";
+
+    public static final String SELECT_DATE_TEXT = "Select Date";
+    public static final String SELECT_TIME_TEXT = "Select Time";
 
     private EditText titleEditText;
     private EditText descriptionEditText;
-    private NumberPicker numberPickerPriority;
 
-    private ImageView imageView;
     //Holds the date and time set
-    String dateSelected = "";
-    String timeSelected = "";
+    String dateSelected = SELECT_DATE_TEXT;
+    String timeSelected = SELECT_TIME_TEXT;
+
+    private Calendar fCalendar;
+
+    private boolean reminderBooleanFromMainActivity = false;
+    private boolean editActivityBoolean = false;
+    private String dateFromIntent = "";
+
+    //Reminder TextViews
+    private TextView timeTextView;
+    private TextView dateTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,21 +66,86 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         //Adding the Close to the action bar
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
-        fNotificationManagerCompat = NotificationManagerCompat.from(this);
+        Log.d("TIME: ", "AddEditActivity launched");
 
-
+        //Note Title and Description Edits
         titleEditText = findViewById(R.id.edit_text_title);
         descriptionEditText = findViewById(R.id.edit_text_description);
-        numberPickerPriority = findViewById(R.id.number_picker_priority);
 
-        numberPickerPriority.setMinValue(1);
-        numberPickerPriority.setMaxValue(10);
+        fCalendar = Calendar.getInstance();
 
-        Calendar globalCalendar = Calendar.getInstance();
+        //Setting the title of the action bar
+        //Get the id of the note from the intent that started this activity if we are editing the note
+        Intent intent = getIntent();
+        if (intent.hasExtra(EXTRA_ID)) {
+            //Populate the view accordingly
+            setTitle("Edit Note");
+            titleEditText.setText(intent.getStringExtra(EXTRA_TITLE));
+            descriptionEditText.setText(intent.getStringExtra(EXTRA_DESCRIPTION));
+            reminderBooleanFromMainActivity = intent.getBooleanExtra(EXTRA_REMINDER_BOOLEAN, false);
+            dateFromIntent = intent.getStringExtra(EXTRA_DATE);
+
+            //Get the date and time from date
+            if (dateFromIntent != null && intent.getIntExtra(EXTRA_ID, -1) != -1) {
+                //If note has reminder, check if the date has passed
+                if (reminderBooleanFromMainActivity){
+                    //Set the EditActivityBoolean to true
+                    editActivityBoolean = true;
+                    //Get the date from the note
+                    Calendar calendarDate = Calendar.getInstance();
+                    Date date1;
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'S'");
+                    Log.d("TIME:: ", "Date is not null: " + dateFromIntent);
+                    try {
+                        date1 = (Date) simpleDateFormat.parse(dateFromIntent);
+                        Log.d("TIME", "Date Object: " + date1);
+                        calendarDate.setTime(date1);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    //Compare with the current date
+                    Calendar currentDate = fCalendar;
+                    if (currentDate.after(calendarDate)){
+                        //if the reminder date is in the past
+                        reminderBooleanFromMainActivity = false;
+                        editActivityBoolean = false;
+                        dateFromIntent = null;
+                    } else{
+                        //The date will be as from the intent
+                        //Update the time and date text holders
+                        timeSelected = DateFormat.getTimeInstance(DateFormat.SHORT).format(calendarDate.getTime());
+                        dateSelected = DateFormat.getDateInstance().format(calendarDate.getTime());
+                    }
+                    Log.d("TIME: ", "TimeText: " + timeSelected);
+                    Log.d("TIME: ", "DateText: " + dateSelected);
+
+                }
+            } else {
+                Log.d("TIME:: ", "Date is null");
+            }
+        } else {
+            setTitle("Add Note");
+        }
 
         //The reminder buttons
         Button pickDate = findViewById(R.id.pick_date);
         Button pickTime = findViewById(R.id.pick_time);
+
+        Button setReminderBtn = findViewById(R.id.set_reminder);
+        Button cancelReminderBtn = findViewById(R.id.cancel_reminder);
+
+        setReminderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setRemainder();
+            }
+        });
+        cancelReminderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelRemainder();
+            }
+        });
 
         pickDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,30 +161,12 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
                 timePicker.show(getSupportFragmentManager(), "time picker");
             }
         });
-
-
-        //Notification icon
-        imageView = findViewById(R.id.notification_icon);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setRemainder();
-            }
-        });
-
-
-        //Setting the title of the action bar
-        //Get the id of the note from the intent that started this activity if we are editing the note
-        Intent intent = getIntent();
-        if (intent.hasExtra(EXTRA_ID)) {
-            //Populate the view accordingly
-            setTitle("Edit Note");
-            titleEditText.setText(intent.getStringExtra(EXTRA_TITLE));
-            descriptionEditText.setText(intent.getStringExtra(EXTRA_DESCRIPTION));
-            numberPickerPriority.setValue(intent.getIntExtra(EXTRA_PRIORITY, 1));
-        } else {
-            setTitle("Add Note");
-        }
+        //Set the time and date texts
+        timeTextView = findViewById(R.id.reminder_time_textView);
+        dateTextView = findViewById(R.id.reminder_date_textView);
+        //Set the time and date Texts
+        timeTextView.setText(timeSelected);
+        dateTextView.setText(dateSelected);
 
     }//End of onCreate
 
@@ -126,7 +175,6 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         //Get the values from the views
         String title = titleEditText.getText().toString();
         String description = descriptionEditText.getText().toString();
-        int priority = numberPickerPriority.getValue();
 
         //Check if title and description fields are empty
         //trim removes the empty spaces before and after the word
@@ -138,19 +186,83 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         Intent data = new Intent();
         data.putExtra(EXTRA_TITLE, title);
         data.putExtra(EXTRA_DESCRIPTION, description);
-        data.putExtra(EXTRA_PRIORITY, priority);
+        data.putExtra(EXTRA_REMINDER_BOOLEAN, editActivityBoolean);
+        Log.d("TIME: ", "ReminderBoolean: " + editActivityBoolean);
 
         //If we are saving a note that we have edited
         int id = getIntent().getIntExtra(EXTRA_ID, -1);
-        //-1 is an invalid id
-        if (id != -1){
-            //Include the id as the one for the original unedited note
-            data.putExtra(EXTRA_ID, id);
+        Log.d("TIME: ", "ID from Intent" + id);
+        //Get the selected date as a string
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'S'");
+        Date date1 = fCalendar.getTime();
+        Log.d("TIME:", "Date Object: " + date1);
+        String dateToBeSaved = simpleDateFormat.format(date1);//calendar.getTime() returns a Date
+
+        //If it is an edited note
+        if (id != -1) {
+            Log.d("TIME: ", "ID: is not -1: " + id);
+            //Note to be updated has a reminder
+            if (editActivityBoolean) {
+                //Check if it had a reminder from MainActivity
+                if (reminderBooleanFromMainActivity){
+                    //Include the id and the date from the intent
+                    data.putExtra(EXTRA_ID, id);
+                    data.putExtra(EXTRA_DATE, dateFromIntent);
+                    Log.d("TIME: ","Updated Note with date from Intent: " + dateFromIntent);
+
+                } else{
+                    //Noe to be updated didn't have a reminder before
+                    //Get the date set and its id
+                    data.putExtra(EXTRA_ID, id);
+                    data.putExtra(EXTRA_DATE, dateToBeSaved);
+                    Log.d("TIME: ","Updated Note date with first reminder " + dateToBeSaved);
+                }
+            } else{
+                //Note to be updated has no reminder
+                dateToBeSaved = null;
+                Log.d("TIME: ", "Update without reminder: " + id);
+                data.putExtra(EXTRA_DATE, dateToBeSaved);
+                data.putExtra(EXTRA_ID, id);
+                Log.d("TITLE: ", "Update Note without reminder: " + dateToBeSaved);
+            }
+        } else if (editActivityBoolean) {
+            //New Note but with a reminder
+            Log.d("TIME: ", "New Note with a reminder: " + editActivityBoolean);
+            //If it is a new note  with a reminder, get the selected date
+            dateToBeSaved = simpleDateFormat.format(date1);//calendar.getTime() returns a Date
+            data.putExtra(EXTRA_DATE, dateToBeSaved);
+            Log.d("TIME: ", "New Note with a reminder: " + id);
+            Log.d("TIME:", "Date Object: " + date1);
         }
+        Log.d("TIME: ", "HasReminder: " + editActivityBoolean);
+        Log.d("TIME: ", "Date to be saved: " + dateToBeSaved);
+        Log.d("TIME: ", "");
+        Log.d("TIME: ", "IID: " + id);
 
         //If saving was correct
         setResult(RESULT_OK, data);
         finish();
+    }
+
+    private void setRemainder() {
+        Log.d("TIME: ", "setReminder called");
+        //Check is date or time is set
+        if (!timeSelected.equals(SELECT_TIME_TEXT) || !dateSelected.equals(SELECT_DATE_TEXT)) {
+            //Set the boolean to true
+            editActivityBoolean = true;
+            Log.d("TIME: ", "remainderBoolean: " + true);
+        } else {
+            Log.d("TIME: ", "remainderBoolean: " + false);
+            StyleableToast.makeText(this, "Please select a date or time first", Toast.LENGTH_SHORT, R.style.plainToast).show();
+        }
+    }
+
+    private void cancelRemainder() {
+        //set the reminderBoolean to be false
+        editActivityBoolean = false;
+        //revert the textViews to the original texts
+        timeTextView.setText(SELECT_DATE_TEXT);
+        dateTextView.setText(SELECT_DATE_TEXT);
     }
 
     @Override
@@ -162,13 +274,11 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save_note:
-                saveNote();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.save_note) {
+            saveNote();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -176,12 +286,12 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         //If we are saving a note that we have edited
         int id = getIntent().getIntExtra(EXTRA_ID, -1);
         //Check if it has an id
-        if (id != -1){
+        if (id != -1) {
             EditNoteBottomSheetDialog bottomSheetDialog = new EditNoteBottomSheetDialog();
             bottomSheetDialog.show(getSupportFragmentManager(), "Bottom Sheet");
         } else {
             //Check if the fields are empty
-            if (!checkIfIsEmpty()){
+            if (!checkIfIsEmpty()) {
                 saveNote();
                 return;
             }
@@ -201,80 +311,45 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
 
     @Override
     public void onButtonClicked(String text) {
-        if (text.equals("Save")){
+        if (text.equals("Save")) {
             saveNote();
-        } else if (text.equals("Cancel")){
+        } else if (text.equals("Cancel")) {
             finish();
         }
     }
+
     //Returns the time set in the dialog
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-        calendar.set(Calendar.MINUTE, minute);
-        String currentTimeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(calendar.getTime());
-        TextView timeTextView = findViewById(R.id.reminder_time_textView);
-        //Add the time to our global var
-        timeSelected = currentTimeString;
-        timeTextView.setText(currentTimeString);
+        fCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        fCalendar.set(Calendar.MINUTE, minute);
 
-
-
+        setDateText();
     }
+
     //Returns the date set in the dialog
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-        String currentDateString = DateFormat.getDateInstance().format(calendar.getTime());
-        TextView dateTextView = findViewById(R.id.reminder_date_textView);
-        //Add the date to the global var
+        fCalendar.set(Calendar.YEAR, year);
+        fCalendar.set(Calendar.MONTH, month);
+        fCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+        setDateText();
+    }
+
+    private void setDateText() {
+        Log.d("TIME: ", "setDateText called");
+        //Get the selected date and time
+        String currentTimeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(fCalendar.getTime());
+        String currentDateString = DateFormat.getDateInstance().format(fCalendar.getTime());
+        //Update the time and date text holders
+        timeSelected = currentTimeString;
         dateSelected = currentDateString;
-        dateTextView.setText(currentDateString);
+        Log.d("TIME: ", "Date selected " + dateSelected);
+        Log.d("TIME: ", "Time selected " + timeSelected);
+        //Update the TextViews
+        timeTextView.setText(timeSelected);
+        dateTextView.setText(dateSelected);
 
     }
-
-
-    private void setRemainder() {
-        String notificationText = timeSelected + " " + dateSelected;
-        //Get the values from the views
-        String title = titleEditText.getText().toString();
-        String description = descriptionEditText.getText().toString();
-
-        //Check is date or time is set
-        if (!timeSelected.equals("") || !dateSelected.equals("")){
-            //Set the remainder(alarm and notification)
-            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-            Intent intent = new Intent(this, AlertReceiver.class);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-            //Initialize alarm
-           // alarmManager.setExact(AlarmManager.RTC_WAKEUP, );
-
-            //Open AddEditActivity when notification is clicked
-            Intent activityIntent = new Intent(this, AddEditNoteActivity.class);
-            //Use a pending intent that wraps the intent to enable the NotificationManagerCompat to execute the intent
-            //requestCode is used to update or cancel the intent
-            PendingIntent contentIntent = PendingIntent.getActivity(this,
-                    0,activityIntent, 0);
-
-            Notification notificationI = new NotificationCompat.Builder(this, CHANNEL_1_ID)
-                    .setSmallIcon(R.drawable.ic_subject)
-                    .setContentTitle("Reminder: " + title )
-                    .setContentText(description)
-                    .setColor(getResources().getColor(R.color.colorPrimary))
-                    .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                    .setAutoCancel(true)//Dismiss the notification when tapped
-                    .build();
-
-            //Show the notification
-            fNotificationManagerCompat.notify(1, notificationI);
-        }else {
-            StyleableToast.makeText(this, "Please select a date or time first", Toast.LENGTH_SHORT, R.style.plainToast).show();
-        }
-    }
-
 }

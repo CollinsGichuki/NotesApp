@@ -18,7 +18,7 @@ import java.util.List;
 public interface NoteDao {
     //Methods for all the operations in the Note Table
     @Insert
-    void insert(Note note);
+    Long insert(Note note);
     @Update
     void update(Note note);
     @Delete
@@ -26,6 +26,6 @@ public interface NoteDao {
     @Query("DELETE FROM note_table")
     void deleteAllNotes();
     //Room updates LiveData object whenever there are changes to the table
-    @Query("SELECT * FROM note_table ORDER BY priority DESC")
+    @Query("SELECT * FROM note_table")
     LiveData<List<Note>> getAllNotes();
 }
