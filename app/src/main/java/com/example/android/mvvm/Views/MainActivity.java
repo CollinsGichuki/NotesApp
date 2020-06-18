@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 //import androidx.lifecycle.Observer;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -20,6 +21,7 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,6 +47,7 @@ import java.util.List;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
+import static com.example.android.mvvm.Repository.NoteRepository.noteId;
 import static com.example.android.mvvm.Views.AddEditNoteActivity.EXTRA_REMINDER_BOOLEAN;
 import static com.example.android.mvvm.Views.AddEditNoteActivity.EXTRA_DATE;
 
@@ -61,6 +64,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String NOTIFICATION_NOTE_ID = "Notification_NOTE";
     public static final String NOTIFICATION_TIME_ID = "Notification_TIME";
     public static final String NOTIFICATION_TIME_BOOLEAN_ID = "Notification_TIME";
+
+    private Runnable runnable;
+
+    private Note fNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,6 +201,17 @@ public class MainActivity extends AppCompatActivity {
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
+        //Run in a background thread
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                long id = noteId.getValue();
+                int noteIntId = (int) id;
+                Log.d("TIME: ", "Background Thread 2 idLong: " + id);
+                Log.d("TIME: ", "Background Thread 2 idInt: " + noteIntId);
+                Log.d("TIME: ", "Background thread finished");
+            }
+        };
 
         createNotificationChannel();
     }
@@ -243,7 +261,6 @@ public class MainActivity extends AppCompatActivity {
             String title = data.getStringExtra(AddEditNoteActivity.EXTRA_TITLE);
             String description = data.getStringExtra(AddEditNoteActivity.EXTRA_DESCRIPTION);
             boolean reminderBoolean = data.getBooleanExtra(AddEditNoteActivity.EXTRA_REMINDER_BOOLEAN, false);
-
             //Get the date string
             String date = data.getStringExtra(EXTRA_DATE);
             Log.d("TIME: ", "Date String to be stored from AddEditActivity: " + date);
@@ -268,15 +285,22 @@ public class MainActivity extends AppCompatActivity {
             Log.d("TIME", "Date value stored: " + date1);
             //Create a new note
             //Note saves the reminder as a date
-            Note note = new Note(title, description, date1, reminderBoolean);
-            long id = noteViewModel.insert(note);
+            fNote = new Note(title, description, date1, reminderBoolean);
+            noteViewModel.insert(fNote);
+
+            //Start a background thread and read the value of the live data ID value
+            Handler handler = new Handler();
+            //Execute the runnable after 5 seconds
+            handler.postDelayed(runnable, 1500);
+
+            //int id = noteViewModel.insert(note);
+            int id = 0;
             // Reminder uses the Calendar to set the time,
             // note for the note details
             // date to check if it is null
             Log.d("TIME: ", "Inserted Note id in long: " + id);
-            int idInt = (int)id;//Convert into int
-            Log.d("TIME: ", "Inserted Note id in int: " + idInt);
-            createReminder(calendarDate, note, date, idInt, reminderBoolean);
+            Log.d("TIME: ", "Inserted Note id in int: " + id);
+            //createReminder(calendarDate, note, date, id, reminderBoolean);
 
             StyleableToast.makeText(this, "New Note added", Toast.LENGTH_SHORT, R.style.saveNoteToast).show();
         } else if (requestCode == EDIT_NOTE_REQUEST && resultCode == RESULT_OK) {
@@ -298,6 +322,8 @@ public class MainActivity extends AppCompatActivity {
             String title = data.getStringExtra(AddEditNoteActivity.EXTRA_TITLE);
             String description = data.getStringExtra(AddEditNoteActivity.EXTRA_DESCRIPTION);
             boolean reminderBoolean = data.getBooleanExtra(AddEditNoteActivity.EXTRA_REMINDER_BOOLEAN, false);
+            //Set the Boolean value
+
             //Get the date string
             String date = data.getStringExtra(EXTRA_DATE);
             Log.d("TIME: ", "Date String to be updated from AddEditActivity: " + date);

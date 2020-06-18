@@ -28,4 +28,7 @@ public interface NoteDao {
     //Room updates LiveData object whenever there are changes to the table
     @Query("SELECT * FROM note_table")
     LiveData<List<Note>> getAllNotes();
+    //Get the Note with the id
+    @Query("SELECT * FROM note_table WHERE id = :id")
+    LiveData<Note> getNoteAtId(int id);
 }

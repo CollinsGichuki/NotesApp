@@ -1,17 +1,23 @@
 package com.example.android.mvvm.Adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.mvvm.Model.Note;
 import com.example.android.mvvm.R;
+import com.example.android.mvvm.Views.MainActivity;
 
 
 //We extend ListAdapter.RecyclerView which we will use to compare the lists and get a position(for animations)
@@ -49,10 +55,29 @@ public class NoteAdapter extends ListAdapter<Note, NoteAdapter.NoteHolder> {
 
     @Override
     //Binds the data from the Note object to the Views
-    public void onBindViewHolder(@NonNull NoteHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final NoteHolder holder, int position) {
         Note currentNotes = getItem(position);
         holder.textViewTitle.setText(currentNotes.getTitle());
         holder.textViewDescription.setText(currentNotes.getDescription());
+
+        if (!currentNotes.isReminderBoolean()){
+            holder.reminderIcon.setVisibility(View.GONE);
+        } else {
+            holder.reminderIcon.setVisibility(View.VISIBLE);
+        }
+
+//        MutableLiveData<Boolean> reminderState = new MutableLiveData<>();
+//        reminderState.postValue(currentNotes.isReminderBoolean());
+//        reminderState.observe(, new Observer<Boolean>() {
+//            @Override
+//            public void onChanged(Boolean aBoolean) {
+//                if (!aBoolean){
+//                    holder.reminderIcon.setVisibility(View.GONE);
+//                } else {
+//                    holder.reminderIcon.setVisibility(View.VISIBLE);
+//                }
+//            }
+//        });
     }
 
 
@@ -61,15 +86,18 @@ public class NoteAdapter extends ListAdapter<Note, NoteAdapter.NoteHolder> {
         return getItem(position);
     }
 
+
     class NoteHolder extends RecyclerView.ViewHolder {
         //Our Views
         private TextView textViewTitle;
         private TextView textViewDescription;
+        private ImageView reminderIcon;
 
         public NoteHolder(@NonNull View itemView) {
             super(itemView);
             textViewTitle = itemView.findViewById(R.id.text_view_title);
             textViewDescription = itemView.findViewById(R.id.text_view_description);
+            reminderIcon = itemView.findViewById(R.id.notification_icon);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

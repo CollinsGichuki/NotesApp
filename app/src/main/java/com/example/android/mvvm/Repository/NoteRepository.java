@@ -1,14 +1,20 @@
 package com.example.android.mvvm.Repository;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.example.android.mvvm.Model.Note;
 import com.example.android.mvvm.Model.NoteDao;
 import com.example.android.mvvm.Model.NoteDatabase;
 
+import java.util.Arrays;
 import java.util.List;
 
 //The Repository Class provides an abstraction for the raw data to the rest of the App
@@ -16,7 +22,7 @@ import java.util.List;
 public class NoteRepository {
     private NoteDao noteDao;
     private LiveData<List<Note>> allNotes;
-    private long noteId;
+    public static MutableLiveData<Long> noteId;
 
     //The ViewModel requires Application so we include it here too
     public NoteRepository(Application application) {
@@ -27,19 +33,31 @@ public class NoteRepository {
         noteDao = database.noteDao();
         //Assign all notes from the NoteDao method getAllNotes
         allNotes = noteDao.getAllNotes();
+        noteId = new MutableLiveData<>();
     }
 
     //Wrapper methods for all the database operations
     //The ViewModel interacts with these methods
-    public long insert(Note note) {
+    public void insert(Note note) {
         //Instance of the AsyncTask to execute the method
         new InsertNotesAsyncTask(noteDao, new InsertNotesAsyncTask.AsyncResponse() {
             @Override
-            public void processFinish(long id) {
-                noteId= id;//return the id of the newly added note
+            public void processFinish(long noteIDD) {
+                noteId.postValue(noteIDD);
+                Log.d("TIME: ", "Inserted Note_IDD: " + noteIDD);
+                //Log.d("TIME: ", "Inserted Note_idd: " + Arrays.toString(noteIdd));
+                finishedNoteId(noteIDD);
             }
         }).execute(note);
-        return noteId;
+    }
+
+    private void finishedNoteId(long id) {
+        Log.d("TIME: ", "FinishedNoteId " + id);
+    }
+
+    //Get Note with a certain ID
+    public LiveData<Note> getNoteWithId(int id){
+        return noteDao.getNoteAtId(id);
     }
 
     public void update(Note note) {
@@ -62,13 +80,12 @@ public class NoteRepository {
     //We use AsyncTask for the methods to be executed in the background thread
     private static class InsertNotesAsyncTask extends AsyncTask<Note, Void, Long> {
         private NoteDao noteDao;
+        public static long noteID;
 
-        //Value for the id of the newly inserted note
         public interface AsyncResponse {
-            void processFinish(long id);
+            void processFinish(long noteIDD);
         }
-
-        public AsyncResponse delegate;
+        public AsyncResponse delegate = null;
 
         //Since the class is static and we can't directly access NoteDao, we use the constructor
         private InsertNotesAsyncTask(NoteDao noteDao, AsyncResponse delegate) {
@@ -84,6 +101,7 @@ public class NoteRepository {
 
         @Override
         protected void onPostExecute(Long aLong) {
+            super.onPostExecute(aLong);
             delegate.processFinish(aLong);
         }
     }

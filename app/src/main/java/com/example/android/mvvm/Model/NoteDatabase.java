@@ -33,8 +33,8 @@ public abstract class NoteDatabase extends RoomDatabase {
             //roomCallback inserts data to the db when first created
             instance = Room.databaseBuilder(context.getApplicationContext(),
                     NoteDatabase.class, "note_database")
-                    .addMigrations(MIGRATION_1_2)
-                   // .fallbackToDestructiveMigration()
+                    //.addMigrations(MIGRATION_1_2)
+                    .fallbackToDestructiveMigration()
                   //  .addCallback(roomCallback)
                     .build();
         }
