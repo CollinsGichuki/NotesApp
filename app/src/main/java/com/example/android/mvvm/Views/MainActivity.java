@@ -67,7 +67,11 @@ public class MainActivity extends AppCompatActivity {
 
     private Runnable runnable;
 
-    private Note fNote;
+    private Calendar calendarDate;
+    private String date;
+    private String title;
+    private String description;
+    private boolean reminderBoolean;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
 
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         fNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        //Initialize the Calendar object
+        calendarDate = Calendar.getInstance();
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -187,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("TIME::", "DATE VALUE: " + note.getReminderDate());
                 Log.d("TIME::", "ReminderBoolean VALUE: " + note.isReminderBoolean());
                 String stringDate;
-                if (date != null){
+                if (date != null) {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'S'");
                     stringDate = simpleDateFormat.format(date);
                 } else {
@@ -195,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 intent.putExtra(EXTRA_DATE, stringDate);
                 Log.d("TIME::", "DATE String VALUE: " + stringDate);
-                Log.d("TIME::" , "Note Clicked");
+                Log.d("TIME::", "Note Clicked");
                 startActivityForResult(intent, EDIT_NOTE_REQUEST);
                 //Animations for the activity transitions
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -210,6 +216,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("TIME: ", "Background Thread 2 idLong: " + id);
                 Log.d("TIME: ", "Background Thread 2 idInt: " + noteIntId);
                 Log.d("TIME: ", "Background thread finished");
+                //Call createReminder
+                createReminder(calendarDate, date, noteIntId, reminderBoolean, title, description);
             }
         };
 
@@ -231,18 +239,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void createReminder(Calendar calendar, Note note, String date, int id, boolean reminderBoolean) {
-        if (date != null){
+    private void createReminder(Calendar calendar, String date, int id, boolean reminderBoolean, String title, String description) {
+        if (date != null) {
             //Intent for the AlertReceiver Class
             Intent intent = new Intent(this.getApplicationContext(), AlertReceiver.class);
-            intent.putExtra(NOTIFICATION_TITLE_ID, note.getTitle());
-            intent.putExtra(NOTIFICATION_DESC_ID, note.getDescription());
+            intent.putExtra(NOTIFICATION_TITLE_ID, title);
+            intent.putExtra(NOTIFICATION_DESC_ID, description);
             intent.putExtra(NOTIFICATION_TIME_BOOLEAN_ID, reminderBoolean);
             intent.putExtra(NOTIFICATION_TIME_ID, date);//Time to be displayed in the notification
-            Log.d("TIME: ", "ID sent with Notification: " + id);
             intent.putExtra(NOTIFICATION_NOTE_ID, id);
+            Log.d("TIME: ", "ID sent with Notification: " + id);
+            Log.d("TIME: ", "Title sent with Notification: " + title);
+            Log.d("TIME: ", "Desc sent with Notification: " + description);
+            Log.d("TIME: ", "Boolean sent with Notification: " + reminderBoolean);
+            Log.d("TIME: ", "Date sent with Notification: " + date);
 
-            Log.d("TIME: ", "Id sent for reminder: " + note.getId());
             PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             //Set the alarm
             if (alarmManager != null) {
@@ -258,15 +269,16 @@ public class MainActivity extends AppCompatActivity {
         //Find out which request we are handling(requestCode) and if we got a result back(resultCode
         if (requestCode == ADD_NOTE_REQUEST && resultCode == RESULT_OK) {
             //Extract the results sent over for the new note
-            String title = data.getStringExtra(AddEditNoteActivity.EXTRA_TITLE);
-            String description = data.getStringExtra(AddEditNoteActivity.EXTRA_DESCRIPTION);
-            boolean reminderBoolean = data.getBooleanExtra(AddEditNoteActivity.EXTRA_REMINDER_BOOLEAN, false);
+            title = data.getStringExtra(AddEditNoteActivity.EXTRA_TITLE);
+            description = data.getStringExtra(AddEditNoteActivity.EXTRA_DESCRIPTION);
+            reminderBoolean = data.getBooleanExtra(AddEditNoteActivity.EXTRA_REMINDER_BOOLEAN, false);
+
             //Get the date string
-            String date = data.getStringExtra(EXTRA_DATE);
+            date = data.getStringExtra(EXTRA_DATE);
             Log.d("TIME: ", "Date String to be stored from AddEditActivity: " + date);
 
             Date date1 = new Date();
-            Calendar calendarDate = Calendar.getInstance();
+
             //check if there is a date
             if (date != null) {
                 Log.d("TIME: ", "Date is not null");
@@ -280,27 +292,27 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {
                 date1 = null;
+                //calendarDate.setTime(date1);
+                date = null;
                 Log.d("TIME:: ", "Date is NULL");
             }
             Log.d("TIME", "Date value stored: " + date1);
+
             //Create a new note
             //Note saves the reminder as a date
-            fNote = new Note(title, description, date1, reminderBoolean);
-            noteViewModel.insert(fNote);
+            Note note = new Note(title, description, date1, reminderBoolean);
+            noteViewModel.insert(note);
 
             //Start a background thread and read the value of the live data ID value
             Handler handler = new Handler();
-            //Execute the runnable after 5 seconds
-            handler.postDelayed(runnable, 1500);
+            //Execute the runnable after a second
+            handler.postDelayed(runnable, 1000);
+            //Call the createReminder
 
-            //int id = noteViewModel.insert(note);
-            int id = 0;
             // Reminder uses the Calendar to set the time,
             // note for the note details
             // date to check if it is null
-            Log.d("TIME: ", "Inserted Note id in long: " + id);
-            Log.d("TIME: ", "Inserted Note id in int: " + id);
-            //createReminder(calendarDate, note, date, id, reminderBoolean);
+            Log.d("TIME: ", "Calendar from Saving the note: " + calendarDate);
 
             StyleableToast.makeText(this, "New Note added", Toast.LENGTH_SHORT, R.style.saveNoteToast).show();
         } else if (requestCode == EDIT_NOTE_REQUEST && resultCode == RESULT_OK) {
@@ -308,12 +320,12 @@ public class MainActivity extends AppCompatActivity {
             assert data != null;
             int idFromEdit = data.getIntExtra(AddEditNoteActivity.EXTRA_ID, -1);
             Log.d("TIME: ", "ID from Edit: " + idFromEdit);
+
             int id = -2;
-            if (idFromEdit != -1){
+            if (idFromEdit != -1) {
                 id = idFromEdit;
-            }
-            Log.d("TIME: ", "Note ID: " + id);
-            if (id == -1) {
+                Log.d("TIME: ", "Note ID: " + id);
+            } else if (id == -1) {
                 StyleableToast.makeText(this, "Note can't be updated", Toast.LENGTH_SHORT, R.style.noteNotSavedToast).show();
                 return;//leave the if statement
             }
@@ -325,19 +337,19 @@ public class MainActivity extends AppCompatActivity {
             //Set the Boolean value
 
             //Get the date string
-            String date = data.getStringExtra(EXTRA_DATE);
+            String dateUpdate = data.getStringExtra(EXTRA_DATE);
             Log.d("TIME: ", "Date String to be updated from AddEditActivity: " + date);
 
             Date date1 = new Date();
-            Calendar calendarDate = Calendar.getInstance();
+            Calendar calendarDateUpdate = Calendar.getInstance();
             //check if there is a date
-            if (date != null) {
+            if (dateUpdate != null) {
                 Log.d("TIME: ", "Date is not null");
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'S'");
                 try {
-                    date1 = (Date) simpleDateFormat.parse(date);
+                    date1 = (Date) simpleDateFormat.parse(dateUpdate);
                     Log.d("TIME", "Date value is parsed");
-                    calendarDate.setTime(date1);
+                    calendarDateUpdate.setTime(date1);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -351,11 +363,15 @@ public class MainActivity extends AppCompatActivity {
             Note note = new Note(title, description, date1, reminderBoolean);
             note.setId(id);
             noteViewModel.update(note);
+
             // Reminder uses the Calendar to set the time,
             // note for the note details
             // date to check if it is null
             Log.d("TIME: ", "Updated note id: " + id);
-            createReminder(calendarDate, note, date, id, reminderBoolean);
+
+            //createReminder(calendarDate, date, id, reminderBoolean);
+            createReminder(calendarDateUpdate, dateUpdate, id, reminderBoolean, title, description);
+
             StyleableToast.makeText(this, "Note Updated", Toast.LENGTH_SHORT, R.style.saveNoteToast).show();
         }
     }

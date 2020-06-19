@@ -45,14 +45,8 @@ public class NoteRepository {
             public void processFinish(long noteIDD) {
                 noteId.postValue(noteIDD);
                 Log.d("TIME: ", "Inserted Note_IDD: " + noteIDD);
-                //Log.d("TIME: ", "Inserted Note_idd: " + Arrays.toString(noteIdd));
-                finishedNoteId(noteIDD);
             }
         }).execute(note);
-    }
-
-    private void finishedNoteId(long id) {
-        Log.d("TIME: ", "FinishedNoteId " + id);
     }
 
     //Get Note with a certain ID
@@ -80,12 +74,11 @@ public class NoteRepository {
     //We use AsyncTask for the methods to be executed in the background thread
     private static class InsertNotesAsyncTask extends AsyncTask<Note, Void, Long> {
         private NoteDao noteDao;
-        public static long noteID;
 
         public interface AsyncResponse {
             void processFinish(long noteIDD);
         }
-        public AsyncResponse delegate = null;
+        public AsyncResponse delegate;
 
         //Since the class is static and we can't directly access NoteDao, we use the constructor
         private InsertNotesAsyncTask(NoteDao noteDao, AsyncResponse delegate) {

@@ -10,11 +10,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -88,7 +92,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
             //Get the date and time from date
             if (dateFromIntent != null && intent.getIntExtra(EXTRA_ID, -1) != -1) {
                 //If note has reminder, check if the date has passed
-                if (reminderBooleanFromMainActivity){
+                if (reminderBooleanFromMainActivity) {
                     //Set the EditActivityBoolean to true
                     editActivityBoolean = true;
                     //Get the date from the note
@@ -105,12 +109,12 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
                     }
                     //Compare with the current date
                     Calendar currentDate = fCalendar;
-                    if (currentDate.after(calendarDate)){
+                    if (currentDate.after(calendarDate)) {
                         //if the reminder date is in the past
                         reminderBooleanFromMainActivity = false;
                         editActivityBoolean = false;
                         dateFromIntent = null;
-                    } else{
+                    } else {
                         //The date will be as from the intent
                         //Update the time and date text holders
                         timeSelected = DateFormat.getTimeInstance(DateFormat.SHORT).format(calendarDate.getTime());
@@ -128,22 +132,25 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         }
 
         //The reminder buttons
-        Button pickDate = findViewById(R.id.pick_date);
-        Button pickTime = findViewById(R.id.pick_time);
+        ImageButton pickDate = findViewById(R.id.pick_date);
+        ImageButton pickTime = findViewById(R.id.pick_time);
 
-        Button setReminderBtn = findViewById(R.id.set_reminder);
-        Button cancelReminderBtn = findViewById(R.id.cancel_reminder);
-
-        setReminderBtn.setOnClickListener(new View.OnClickListener() {
+        Switch alarmToggle =  findViewById(R.id.alarm_toggle);
+        alarmToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                setRemainder();
-            }
-        });
-        cancelReminderBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cancelRemainder();
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    //Check is date or time is set
+                    if (!timeSelected.equals(SELECT_TIME_TEXT) || !dateSelected.equals(SELECT_DATE_TEXT)) {
+                        //Set the boolean to true
+                        setRemainder();
+                    } else {
+                        buttonView.setChecked(false);
+                        StyleableToast.makeText(AddEditNoteActivity.this, "Please select a date or time first", Toast.LENGTH_SHORT, R.style.plainToast).show();
+                    }
+                } else {
+                    cancelRemainder();
+                }
             }
         });
 
@@ -204,20 +211,20 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
             //Note to be updated has a reminder
             if (editActivityBoolean) {
                 //Check if it had a reminder from MainActivity
-                if (reminderBooleanFromMainActivity){
+                if (reminderBooleanFromMainActivity) {
                     //Include the id and the date from the intent
                     data.putExtra(EXTRA_ID, id);
                     data.putExtra(EXTRA_DATE, dateFromIntent);
-                    Log.d("TIME: ","Updated Note with date from Intent: " + dateFromIntent);
+                    Log.d("TIME: ", "Updated Note with date from Intent: " + dateFromIntent);
 
-                } else{
+                } else {
                     //Noe to be updated didn't have a reminder before
                     //Get the date set and its id
                     data.putExtra(EXTRA_ID, id);
                     data.putExtra(EXTRA_DATE, dateToBeSaved);
-                    Log.d("TIME: ","Updated Note date with first reminder " + dateToBeSaved);
+                    Log.d("TIME: ", "Updated Note date with first reminder " + dateToBeSaved);
                 }
-            } else{
+            } else {
                 //Note to be updated has no reminder
                 dateToBeSaved = null;
                 Log.d("TIME: ", "Update without reminder: " + id);

@@ -65,69 +65,80 @@
                 android:textAppearance="@style/CustomShapeAppearanceBottomSheetDialog"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>
-            <TextView
-                android:id="@+id/reminder_date_textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/date_not_selected"
-                android:textSize="15sp"
-                android:padding="15dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                app:layout_constraintTop_toBottomOf="@+id/bottom_sheet_textView"
-                app:layout_constraintStart_toStartOf="parent"/>
-            <Button
-                android:id="@+id/pick_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/pick_date"
-                android:background="@null"
-                android:layout_marginStart="55dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/reminder_date_textView"
-                app:layout_constraintTop_toBottomOf="@id/bottom_sheet_textView"/>
 
-            <TextView
-                android:id="@+id/reminder_time_textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/time_not_selected"
-                android:textSize="15sp"
-                android:padding="15dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/reminder_date_textView"/>
-
-            <Button
-                android:id="@+id/pick_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/pick_time"
-                android:background="@null"
-                android:layout_marginStart="50dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/reminder_time_textView"
-                app:layout_constraintTop_toBottomOf="@id/reminder_date_textView"/>
-            <LinearLayout
+            <RelativeLayout
+                android:id="@+id/rel_yout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@+id/reminder_time_textView">
-                <Button
-                    android:id="@+id/cancel_reminder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/cancel_reminder"
-                    android:background="@null"
-                    android:layout_marginStart="55dp" />
-                <Button
-                    android:id="@+id/set_reminder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/set_reminder"
-                    android:background="@null"
-                    android:layout_marginStart="50dp"/>
-            </LinearLayout>
+                app:layout_constraintTop_toBottomOf="@id/bottom_sheet_textView"
+                app:layout_constraintStart_toStartOf="parent">
 
+                <TextView
+                    android:id="@+id/reminder_date_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/date_not_selected"
+                    android:textSize="20sp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="10dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:layout_alignParentStart="true"/>
+
+                <ImageButton
+                    android:id="@+id/pick_date"
+                    android:layout_width="75dp"
+                    android:layout_height="60dp"
+                    android:text="@string/pick_date"
+                    android:src="@drawable/ic_calendar"
+                    android:background="@android:color/transparent"
+                    android:layout_marginEnd="10dp"
+                    android:layout_alignParentEnd="true"
+                    android:contentDescription="@string/calendar_icon_desc" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rel_yout_2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rel_yout">
+
+                <TextView
+                    android:id="@+id/reminder_time_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/time_not_selected"
+                    android:textSize="20sp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="15dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:layout_alignParentStart="true"/>
+
+                <ImageButton
+                    android:id="@+id/pick_time"
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:text="@string/pick_time"
+                    android:src="@drawable/ic_time"
+                    android:background="@android:color/transparent"
+                    android:layout_marginEnd="10dp"
+                    android:contentDescription="@string/time_icon_desc"
+                    android:layout_alignParentEnd="true"/>
+
+            </RelativeLayout>
+
+            <Switch
+                android:id="@+id/alarm_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add_reminder"
+                android:layout_margin="10dp"
+                app:layout_constraintTop_toBottomOf="@+id/rel_yout_2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
