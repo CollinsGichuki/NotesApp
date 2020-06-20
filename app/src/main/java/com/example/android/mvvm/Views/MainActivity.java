@@ -54,7 +54,7 @@ import static com.example.android.mvvm.Views.AddEditNoteActivity.EXTRA_DATE;
 public class MainActivity extends AppCompatActivity {
     public static final int ADD_NOTE_REQUEST = 1;
     public static final int EDIT_NOTE_REQUEST = 2;
-    private NoteViewModel noteViewModel;
+    public static NoteViewModel noteViewModel;
     //For Notifications
     private NotificationManager fNotificationManager;
     private AlarmManager alarmManager;
@@ -393,5 +393,11 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+
     }
 }

@@ -8,6 +8,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -33,7 +35,7 @@ public class NoteAdapter extends ListAdapter<Note, NoteAdapter.NoteHolder> {
         @Override
         public boolean areItemsTheSame(@NonNull Note oldItem, @NonNull Note newItem) {
             //Know if the items are the same
-            return oldItem.getId() == newItem.getId();
+            return oldItem.getId() == newItem.getId() && oldItem.isReminderBoolean() == newItem.isReminderBoolean();
         }
 
         @Override
@@ -65,19 +67,6 @@ public class NoteAdapter extends ListAdapter<Note, NoteAdapter.NoteHolder> {
         } else {
             holder.reminderIcon.setVisibility(View.VISIBLE);
         }
-
-//        MutableLiveData<Boolean> reminderState = new MutableLiveData<>();
-//        reminderState.postValue(currentNotes.isReminderBoolean());
-//        reminderState.observe(, new Observer<Boolean>() {
-//            @Override
-//            public void onChanged(Boolean aBoolean) {
-//                if (!aBoolean){
-//                    holder.reminderIcon.setVisibility(View.GONE);
-//                } else {
-//                    holder.reminderIcon.setVisibility(View.VISIBLE);
-//                }
-//            }
-//        });
     }
 
 

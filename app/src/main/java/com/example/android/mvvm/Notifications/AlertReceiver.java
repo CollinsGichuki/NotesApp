@@ -1,5 +1,6 @@
 package com.example.android.mvvm.Notifications;
 
+import android.app.Application;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
@@ -9,8 +10,13 @@ import android.content.Intent;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 
+import com.example.android.mvvm.Model.Note;
 import com.example.android.mvvm.R;
+import com.example.android.mvvm.ViewModel.NoteViewModel;
+import com.example.android.mvvm.ViewModel.NoteViewModelFactory;
 import com.example.android.mvvm.Views.AddEditNoteActivity;
 
 import java.util.Calendar;
@@ -21,6 +27,7 @@ import static com.example.android.mvvm.Views.MainActivity.NOTIFICATION_NOTE_ID;
 import static com.example.android.mvvm.Views.MainActivity.NOTIFICATION_TIME_BOOLEAN_ID;
 import static com.example.android.mvvm.Views.MainActivity.NOTIFICATION_TIME_ID;
 import static com.example.android.mvvm.Views.MainActivity.NOTIFICATION_TITLE_ID;
+import static com.example.android.mvvm.Views.MainActivity.noteViewModel;
 
 public class AlertReceiver extends BroadcastReceiver {
     private static final String NOTIFICATION_CHANNEL_ID = "primary_channel_id";
@@ -35,6 +42,11 @@ public class AlertReceiver extends BroadcastReceiver {
         String time = intent.getStringExtra(NOTIFICATION_TIME_ID);
         int id = intent.getIntExtra(NOTIFICATION_NOTE_ID, -1);
         boolean reminderBoolean = intent.getBooleanExtra(NOTIFICATION_TIME_BOOLEAN_ID, false);
+        //Update the Note
+        Note note = new Note(title, desc, null, false);
+        note.setId(id);
+        noteViewModel.update(note);
+        Log.d("TIME: ", "Note updated");
         Log.d("TIME: ", "reminderBoolean received: " + reminderBoolean);
         deliverNotification(context, title, desc, time, id);
     }
