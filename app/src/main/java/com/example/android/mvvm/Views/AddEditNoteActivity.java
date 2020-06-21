@@ -52,6 +52,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
     //Holds the date and time set
     String dateSelected = SELECT_DATE_TEXT;
     String timeSelected = SELECT_TIME_TEXT;
+    String currentDay = "";
 
     private Calendar fCalendar;
 
@@ -78,6 +79,8 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
 
         fCalendar = Calendar.getInstance();
 
+        Switch alarmToggle =  findViewById(R.id.alarm_toggle);
+
         //Setting the title of the action bar
         //Get the id of the note from the intent that started this activity if we are editing the note
         Intent intent = getIntent();
@@ -97,9 +100,10 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
                     editActivityBoolean = true;
                     //Get the date from the note
                     Calendar calendarDate = Calendar.getInstance();
-                    Date date1;
+                    Date date1 = new Date();
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'S'");
                     Log.d("TIME:: ", "Date is not null: " + dateFromIntent);
+
                     try {
                         date1 = (Date) simpleDateFormat.parse(dateFromIntent);
                         Log.d("TIME", "Date Object: " + date1);
@@ -118,7 +122,17 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
                         //The date will be as from the intent
                         //Update the time and date text holders
                         timeSelected = DateFormat.getTimeInstance(DateFormat.SHORT).format(calendarDate.getTime());
-                        dateSelected = DateFormat.getDateInstance().format(calendarDate.getTime());
+
+                        //Get the current day
+                        SimpleDateFormat simpleDayFormat = new SimpleDateFormat("EEEE");
+                        currentDay = simpleDayFormat.format(date1);//calendar.getTime() returns a Date
+                        dateSelected = currentDay + ", " + DateFormat.getDateInstance().format(calendarDate.getTime());
+
+                        //Set the text to edit reminder and set the toggle to checked
+                        TextView reminderText = findViewById(R.id.bottom_sheet_textView);
+                        reminderText.setText(R.string.edit_reminder_text);
+
+                        alarmToggle.setChecked(true);
                     }
                     Log.d("TIME: ", "TimeText: " + timeSelected);
                     Log.d("TIME: ", "DateText: " + dateSelected);
@@ -135,7 +149,6 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         ImageButton pickDate = findViewById(R.id.pick_date);
         ImageButton pickTime = findViewById(R.id.pick_time);
 
-        Switch alarmToggle =  findViewById(R.id.alarm_toggle);
         alarmToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -349,9 +362,16 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         //Get the selected date and time
         String currentTimeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(fCalendar.getTime());
         String currentDateString = DateFormat.getDateInstance().format(fCalendar.getTime());
+
+        //Get the selected day as a string
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE");
+        Date date1 = fCalendar.getTime();
+        Log.d("TIME:", "Date Object: " + date1);
+        String currentDay = simpleDateFormat.format(date1);//calendar.getTime() returns a Date
+
         //Update the time and date text holders
         timeSelected = currentTimeString;
-        dateSelected = currentDateString;
+        dateSelected = currentDay + ", " + currentDateString;
         Log.d("TIME: ", "Date selected " + dateSelected);
         Log.d("TIME: ", "Time selected " + timeSelected);
         //Update the TextViews

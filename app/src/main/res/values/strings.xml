@@ -13,4 +13,5 @@
     <string name="title">Title</string>
     <string name="calendar_icon_desc">Calendar</string>
     <string name="time_icon_desc">time_icon</string>
+    <string name="edit_reminder_text">Edit Reminder</string>
 </resources>
