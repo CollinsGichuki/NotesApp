@@ -14,4 +14,35 @@
     <string name="calendar_icon_desc">Calendar</string>
     <string name="time_icon_desc">time_icon</string>
     <string name="edit_reminder_text">Edit Reminder</string>
+
+    <string name="pref_Night_mode_key">night_mode_state_key</string>
+    <string name="select_theme">Select Theme</string>
+
+    <!--    The List Preference Labels-->
+    <string name="default_mode_label">System Default</string>
+    <string name="dark_mode_label">Dark Mode</string>
+    <string name="day_mode_label">Day Mode</string>
+
+    <!--    The List Preference values-->
+    <string name="default_mode_value">System Default</string>
+    <string name="dark_mode_value">Dark Mode</string>
+    <string name="day_mode_value">Day Mode</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_settings">Settings</string>
+
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>

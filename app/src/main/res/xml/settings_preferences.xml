@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:defaultValue="@string/default_mode_value"
+        android:entries="@array/pref_theme_option_labels"
+        android:entryValues="@array/pref_theme_option_values"
+        android:icon="@drawable/ic_settings"
+        android:key="@string/pref_Night_mode_key"
+        android:title="@string/select_theme"
+        android:dialogTitle="Choose a Theme"/>
+
+</PreferenceScreen>
