@@ -3,6 +3,7 @@ package com.example.android.mvvm.Views;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -30,6 +31,7 @@ import com.example.android.mvvm.Reminder.TimePickerFragment;
 import com.muddzdev.styleabletoast.StyleableToast;
 
 import java.text.DateFormat;
+import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -63,6 +65,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
     //Reminder TextViews
     private TextView timeTextView;
     private TextView dateTextView;
+    private SimpleDateFormat simpleDateFormat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +81,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         descriptionEditText = findViewById(R.id.edit_text_description);
 
         fCalendar = Calendar.getInstance();
+        simpleDateFormat = new SimpleDateFormat("EEEE");
 
         Switch alarmToggle =  findViewById(R.id.alarm_toggle);
 
@@ -101,11 +105,11 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
                     //Get the date from the note
                     Calendar calendarDate = Calendar.getInstance();
                     Date date1 = new Date();
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'S'");
+                    SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'S'");
                     Log.d("TIME:: ", "Date is not null: " + dateFromIntent);
 
                     try {
-                        date1 = (Date) simpleDateFormat.parse(dateFromIntent);
+                        date1 = (Date) simpleDateFormat1.parse(dateFromIntent);
                         Log.d("TIME", "Date Object: " + date1);
                         calendarDate.setTime(date1);
                     } catch (ParseException e) {
@@ -124,8 +128,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
                         timeSelected = DateFormat.getTimeInstance(DateFormat.SHORT).format(calendarDate.getTime());
 
                         //Get the current day
-                        SimpleDateFormat simpleDayFormat = new SimpleDateFormat("EEEE");
-                        currentDay = simpleDayFormat.format(date1);//calendar.getTime() returns a Date
+                        currentDay = simpleDateFormat.format(date1);//calendar.getTime() returns a Date
                         dateSelected = currentDay + ", " + DateFormat.getDateInstance().format(calendarDate.getTime());
 
                         //Set the text to edit reminder and set the toggle to checked
@@ -212,11 +215,18 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         //If we are saving a note that we have edited
         int id = getIntent().getIntExtra(EXTRA_ID, -1);
         Log.d("TIME: ", "ID from Intent" + id);
+
         //Get the selected date as a string
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'S'");
         Date date1 = fCalendar.getTime();
         Log.d("TIME:", "Date Object: " + date1);
-        String dateToBeSaved = simpleDateFormat.format(date1);//calendar.getTime() returns a Date
+
+        //Get the day
+        String day = simpleDateFormat.format(date1);
+        String time = DateFormat.getTimeInstance(DateFormat.SHORT).format(date1);
+        String dateToBeSaved = day + ", " + time;
+
+        Log.d("Date: ", dateToBeSaved);
+        //String dateToBeSaved = simpleDateFormat.format(date1);//calendar.getTime() returns a Date
 
         //If it is an edited note
         if (id != -1) {
@@ -249,7 +259,9 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
             //New Note but with a reminder
             Log.d("TIME: ", "New Note with a reminder: " + editActivityBoolean);
             //If it is a new note  with a reminder, get the selected date
-            dateToBeSaved = simpleDateFormat.format(date1);//calendar.getTime() returns a Date
+            String dayUpdate = simpleDateFormat.format(date1);
+            String timeUpdate = DateFormat.getTimeInstance(DateFormat.SHORT).format(date1);
+            dateToBeSaved = dayUpdate + ", " + timeUpdate;
             data.putExtra(EXTRA_DATE, dateToBeSaved);
             Log.d("TIME: ", "New Note with a reminder: " + id);
             Log.d("TIME:", "Date Object: " + date1);
@@ -364,7 +376,6 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         String currentDateString = DateFormat.getDateInstance().format(fCalendar.getTime());
 
         //Get the selected day as a string
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE");
         Date date1 = fCalendar.getTime();
         Log.d("TIME:", "Date Object: " + date1);
         String currentDay = simpleDateFormat.format(date1);//calendar.getTime() returns a Date

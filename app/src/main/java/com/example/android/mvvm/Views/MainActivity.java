@@ -24,6 +24,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -164,6 +165,8 @@ public class MainActivity extends AppCompatActivity {
                         noteViewModel.insert(note[0]);
                     }
                 });
+                snackbar.setTextColor(Color.WHITE);
+                snackbar.setActionTextColor(Color.WHITE);
                 snackbar.show();
             }
 
@@ -172,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
             public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 //Use a library to draw the background icon, color and text
                 new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                        .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.colorSecondaryDark))
+                        .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.colorPrimaryDark))
                         .addSwipeLeftActionIcon(R.drawable.ic_delete)
                         .create()
                         .decorate();

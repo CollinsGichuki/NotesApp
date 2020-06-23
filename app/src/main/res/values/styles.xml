@@ -1,16 +1,25 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorSecondary</item>
-        <item name="actionBarTabTextStyle">@android:color/black</item>
+        <item name="colorSecondary">#004d40</item>
+        <item name="colorSecondaryVariant">#00251a</item>
+
+        <item name="android:actionBarTabStyle">@style/MyActionBarStyle</item>
         //Animations for the whole app
         <item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>
 
     </style>
+    //ActionBar
+    <style name="MyActionBarStyle" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="android:textColor">@android:color/white</item>
+
+    </style>
+
     //Style for the bottomSheetDialogFragment
     <style name="CustomBottomDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
