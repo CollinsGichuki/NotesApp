@@ -3,14 +3,12 @@ package com.example.android.mvvm.Views;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -19,7 +17,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,7 +28,6 @@ import com.example.android.mvvm.Reminder.TimePickerFragment;
 import com.muddzdev.styleabletoast.StyleableToast;
 
 import java.text.DateFormat;
-import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -44,9 +40,11 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
     public static final String EXTRA_DESCRIPTION = "com.example.android.mvvm.EXTRA_DESCRIPTION";
     public static final String EXTRA_REMINDER_BOOLEAN = "com.example.android.mvvm.EXTRA_REMINDER_BOOLEAN";
     public static final String EXTRA_DATE = "com.example.android.mvvm.EXTRA_REMINDER_DATE";
+    public static final String EXTRA_DATE_TEXT = "com.example.android.mvvm.EXTRA_REMINDER_DATE_STRING";
 
     public static final String SELECT_DATE_TEXT = "Select Date";
     public static final String SELECT_TIME_TEXT = "Select Time";
+    public final String TAG = "TIME:";
 
     private EditText titleEditText;
     private EditText descriptionEditText;
@@ -61,11 +59,13 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
     private boolean reminderBooleanFromMainActivity = false;
     private boolean editActivityBoolean = false;
     private String dateFromIntent = "";
+    private String dateTextFromIntent = "";
 
     //Reminder TextViews
     private TextView timeTextView;
     private TextView dateTextView;
-    private SimpleDateFormat simpleDateFormat;
+    private SimpleDateFormat simpleDayFormat;
+    public Boolean dateTimeSet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,14 +74,14 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         //Adding the Close to the action bar
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
-        Log.d("TIME: ", "AddEditActivity launched");
+        Log.d(TAG + " ", "AddEditActivity launched");
 
         //Note Title and Description Edits
         titleEditText = findViewById(R.id.edit_text_title);
         descriptionEditText = findViewById(R.id.edit_text_description);
 
         fCalendar = Calendar.getInstance();
-        simpleDateFormat = new SimpleDateFormat("EEEE");
+        simpleDayFormat = new SimpleDateFormat("EEEE");
 
         Switch alarmToggle =  findViewById(R.id.alarm_toggle);
 
@@ -95,6 +95,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
             descriptionEditText.setText(intent.getStringExtra(EXTRA_DESCRIPTION));
             reminderBooleanFromMainActivity = intent.getBooleanExtra(EXTRA_REMINDER_BOOLEAN, false);
             dateFromIntent = intent.getStringExtra(EXTRA_DATE);
+            dateTextFromIntent = intent.getStringExtra(EXTRA_DATE_TEXT);
 
             //Get the date and time from date
             if (dateFromIntent != null && intent.getIntExtra(EXTRA_ID, -1) != -1) {
@@ -106,7 +107,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
                     Calendar calendarDate = Calendar.getInstance();
                     Date date1 = new Date();
                     SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'S'");
-                    Log.d("TIME:: ", "Date is not null: " + dateFromIntent);
+                    Log.d(TAG + ": ", "Date is not null: " + dateFromIntent);
 
                     try {
                         date1 = (Date) simpleDateFormat1.parse(dateFromIntent);
@@ -122,13 +123,14 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
                         reminderBooleanFromMainActivity = false;
                         editActivityBoolean = false;
                         dateFromIntent = null;
+                        dateTextFromIntent = null;
                     } else {
                         //The date will be as from the intent
                         //Update the time and date text holders
                         timeSelected = DateFormat.getTimeInstance(DateFormat.SHORT).format(calendarDate.getTime());
 
                         //Get the current day
-                        currentDay = simpleDateFormat.format(date1);//calendar.getTime() returns a Date
+                        currentDay = simpleDayFormat.format(date1);//calendar.getTime() returns a Date
                         dateSelected = currentDay + ", " + DateFormat.getDateInstance().format(calendarDate.getTime());
 
                         //Set the text to edit reminder and set the toggle to checked
@@ -137,12 +139,12 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
 
                         alarmToggle.setChecked(true);
                     }
-                    Log.d("TIME: ", "TimeText: " + timeSelected);
-                    Log.d("TIME: ", "DateText: " + dateSelected);
+                    Log.d(TAG + " ", "TimeText: " + timeSelected);
+                    Log.d(TAG + " ", "DateText: " + dateSelected);
 
                 }
             } else {
-                Log.d("TIME:: ", "Date is null");
+                Log.d(TAG + ": ", "Date is null");
             }
         } else {
             setTitle("Add Note");
@@ -210,66 +212,81 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         data.putExtra(EXTRA_TITLE, title);
         data.putExtra(EXTRA_DESCRIPTION, description);
         data.putExtra(EXTRA_REMINDER_BOOLEAN, editActivityBoolean);
-        Log.d("TIME: ", "ReminderBoolean: " + editActivityBoolean);
+        Log.d(TAG + " ", "ReminderBoolean: " + editActivityBoolean);
 
         //If we are saving a note that we have edited
         int id = getIntent().getIntExtra(EXTRA_ID, -1);
-        Log.d("TIME: ", "ID from Intent" + id);
+        Log.d(TAG + " ", "ID from Intent" + id);
 
         //Get the selected date as a string
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'S'");
         Date date1 = fCalendar.getTime();
-        Log.d("TIME:", "Date Object: " + date1);
+
+        String dateToBeSavedNew = simpleDateFormat.format(date1);//calendar.getTime() returns a Date
+        Log.d(TAG, "Date Object: " + date1);
 
         //Get the day
-        String day = simpleDateFormat.format(date1);
+        String day = simpleDayFormat.format(date1);
         String time = DateFormat.getTimeInstance(DateFormat.SHORT).format(date1);
-        String dateToBeSaved = day + ", " + time;
+        String dateToBeSavedText = day + ", " + time;
 
-        Log.d("Date: ", dateToBeSaved);
-        //String dateToBeSaved = simpleDateFormat.format(date1);//calendar.getTime() returns a Date
+        Log.d("Date: ", dateToBeSavedText);
 
         //If it is an edited note
         if (id != -1) {
-            Log.d("TIME: ", "ID: is not -1: " + id);
+            Log.d(TAG + " ", "ID: is not -1: " + id);
             //Note to be updated has a reminder
             if (editActivityBoolean) {
                 //Check if it had a reminder from MainActivity
                 if (reminderBooleanFromMainActivity) {
-                    //Include the id and the date from the intent
+                    //Check if the updated note has an updated date
+                    if (dateTimeSet){
+                        //Use the updated date
+                        data.putExtra(EXTRA_DATE, dateToBeSavedNew);
+                        data.putExtra(EXTRA_DATE_TEXT, dateToBeSavedText);
+                        Log.d(TAG , "Updated Note with updated data: " + dateToBeSavedNew);
+                    } else {
+                        //Use date from intent
+                        data.putExtra(EXTRA_DATE, dateFromIntent);
+                        data.putExtra(EXTRA_DATE_TEXT, dateTextFromIntent);
+                        Log.d(TAG , "Updated Note with date from Intent: " + dateFromIntent);
+                    }
+                    //Include the id from the intent
                     data.putExtra(EXTRA_ID, id);
-                    data.putExtra(EXTRA_DATE, dateFromIntent);
-                    Log.d("TIME: ", "Updated Note with date from Intent: " + dateFromIntent);
-
                 } else {
                     //Noe to be updated didn't have a reminder before
                     //Get the date set and its id
                     data.putExtra(EXTRA_ID, id);
-                    data.putExtra(EXTRA_DATE, dateToBeSaved);
-                    Log.d("TIME: ", "Updated Note date with first reminder " + dateToBeSaved);
+                    data.putExtra(EXTRA_DATE, dateToBeSavedNew);
+                    data.putExtra(EXTRA_DATE_TEXT, dateToBeSavedText);
+                    Log.d(TAG , "Updated Note dateNew with first reminder " + dateToBeSavedNew);
+                    Log.d(TAG , "Updated Note date text with first reminder " + dateToBeSavedText);
                 }
             } else {
                 //Note to be updated has no reminder
-                dateToBeSaved = null;
-                Log.d("TIME: ", "Update without reminder: " + id);
-                data.putExtra(EXTRA_DATE, dateToBeSaved);
+               dateToBeSavedNew = null;
+               dateToBeSavedText = null;
+                Log.d(TAG + " ", "Update without reminder: " + id);
+                data.putExtra(EXTRA_DATE, dateToBeSavedNew);
+                data.putExtra(EXTRA_DATE_TEXT, dateToBeSavedText);
                 data.putExtra(EXTRA_ID, id);
-                Log.d("TITLE: ", "Update Note without reminder: " + dateToBeSaved);
             }
         } else if (editActivityBoolean) {
             //New Note but with a reminder
-            Log.d("TIME: ", "New Note with a reminder: " + editActivityBoolean);
-            //If it is a new note  with a reminder, get the selected date
-            String dayUpdate = simpleDateFormat.format(date1);
+            Log.d(TAG, "New Note with a reminder: " + editActivityBoolean);
+            //Get the selected date
+            String dayUpdate = simpleDayFormat.format(date1);
             String timeUpdate = DateFormat.getTimeInstance(DateFormat.SHORT).format(date1);
-            dateToBeSaved = dayUpdate + ", " + timeUpdate;
-            data.putExtra(EXTRA_DATE, dateToBeSaved);
-            Log.d("TIME: ", "New Note with a reminder: " + id);
-            Log.d("TIME:", "Date Object: " + date1);
+            dateToBeSavedText = dayUpdate + ", " + timeUpdate;
+
+            data.putExtra(EXTRA_DATE, dateToBeSavedNew);
+            data.putExtra(EXTRA_DATE_TEXT, dateToBeSavedText);
+            Log.d(TAG + " ", "New Note with a reminder: " + id);
+            Log.d(TAG, "Date Object: " + date1);
         }
-        Log.d("TIME: ", "HasReminder: " + editActivityBoolean);
-        Log.d("TIME: ", "Date to be saved: " + dateToBeSaved);
-        Log.d("TIME: ", "");
-        Log.d("TIME: ", "IID: " + id);
+        Log.d(TAG, "HasReminder: " + editActivityBoolean);
+        Log.d(TAG, "Date to be saved: " + dateToBeSavedNew);
+        Log.d(TAG, "IID: " + id);
 
         //If saving was correct
         setResult(RESULT_OK, data);
@@ -277,14 +294,14 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
     }
 
     private void setRemainder() {
-        Log.d("TIME: ", "setReminder called");
+        Log.d(TAG, "setReminder called");
         //Check is date or time is set
         if (!timeSelected.equals(SELECT_TIME_TEXT) || !dateSelected.equals(SELECT_DATE_TEXT)) {
             //Set the boolean to true
             editActivityBoolean = true;
-            Log.d("TIME: ", "remainderBoolean: " + true);
+            Log.d(TAG, "remainderBoolean: " + editActivityBoolean);
         } else {
-            Log.d("TIME: ", "remainderBoolean: " + false);
+            Log.d(TAG, "remainderBoolean: " + editActivityBoolean);
             StyleableToast.makeText(this, "Please select a date or time first", Toast.LENGTH_SHORT, R.style.plainToast).show();
         }
     }
@@ -370,21 +387,21 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
     }
 
     private void setDateText() {
-        Log.d("TIME: ", "setDateText called");
+        dateTimeSet = true;
         //Get the selected date and time
         String currentTimeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(fCalendar.getTime());
         String currentDateString = DateFormat.getDateInstance().format(fCalendar.getTime());
 
         //Get the selected day as a string
         Date date1 = fCalendar.getTime();
-        Log.d("TIME:", "Date Object: " + date1);
-        String currentDay = simpleDateFormat.format(date1);//calendar.getTime() returns a Date
+        Log.d(TAG, "Date Object: " + date1);
+        String currentDay = simpleDayFormat.format(date1);//calendar.getTime() returns a Date
 
         //Update the time and date text holders
         timeSelected = currentTimeString;
         dateSelected = currentDay + ", " + currentDateString;
-        Log.d("TIME: ", "Date selected " + dateSelected);
-        Log.d("TIME: ", "Time selected " + timeSelected);
+        Log.d(TAG, "Date selected " + dateSelected);
+        Log.d(TAG, "Time selected " + timeSelected);
         //Update the TextViews
         timeTextView.setText(timeSelected);
         dateTextView.setText(dateSelected);

@@ -48,16 +48,20 @@ import com.muddzdev.styleabletoast.StyleableToast;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 import static com.example.android.mvvm.Repository.NoteRepository.noteId;
+import static com.example.android.mvvm.Views.AddEditNoteActivity.EXTRA_DATE_TEXT;
 import static com.example.android.mvvm.Views.AddEditNoteActivity.EXTRA_REMINDER_BOOLEAN;
 import static com.example.android.mvvm.Views.AddEditNoteActivity.EXTRA_DATE;
 
 public class MainActivity extends AppCompatActivity {
+    public final String TAG = "TIME:";
     public static final int ADD_NOTE_REQUEST = 1;
     public static final int EDIT_NOTE_REQUEST = 2;
     public static NoteViewModel noteViewModel;
@@ -78,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private String title;
     private String description;
     private boolean reminderBoolean;
+    public String dateText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,8 +134,9 @@ public class MainActivity extends AppCompatActivity {
         Retrieving the ViewModel
         */
         noteViewModel = new ViewModelProvider(this, new NoteViewModelFactory(this.getApplication())).get(NoteViewModel.class);
+        final LiveData<List<Note>> noteList = noteViewModel.getAllNotes();
         //Observe is a LiveData method
-        noteViewModel.getAllNotes().observe(this, new Observer<List<Note>>() {
+        noteList.observe(this, new Observer<List<Note>>() {
             //Triggered when data in the LiveData object changes/ activity is in the foreground or orientation changed
             @Override
             public void onChanged(List<Note> notes) {
@@ -142,11 +148,16 @@ public class MainActivity extends AppCompatActivity {
         final Note[] note = {null};
 
         //Class that makes the recyclerView touchable
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                 ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
+                //Rearrange the items
+                int oldPosition = viewHolder.getAdapterPosition();
+                int newPosition = target.getAdapterPosition();
+                
+                noteAdapter.notifyItemMoved(oldPosition, newPosition);
+                return true;
             }
 
             //Swipe Left to delete
@@ -225,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("TIME: ", "Background Thread 2 idInt: " + noteIntId);
                 Log.d("TIME: ", "Background thread finished");
                 //Call createReminder
-                createReminder(calendarDate, date, noteIntId, reminderBoolean, title, description);
+                createReminder(calendarDate, dateText, noteIntId, reminderBoolean, title, description);
             }
         };
 
@@ -283,7 +294,10 @@ public class MainActivity extends AppCompatActivity {
 
             //Get the date string
             date = data.getStringExtra(EXTRA_DATE);
+            //Get the date Text
+            dateText = data.getStringExtra(EXTRA_DATE_TEXT);
             Log.d("TIME: ", "Date String to be stored from AddEditActivity: " + date);
+            Log.d("TIME: ", "Date Text to be stored from AddEditActivity: " + dateText);
 
             Date date1 = new Date();
 
@@ -320,7 +334,8 @@ public class MainActivity extends AppCompatActivity {
             // Reminder uses the Calendar to set the time,
             // note for the note details
             // date to check if it is null
-            Log.d("TIME: ", "Calendar from Saving the note: " + calendarDate);
+
+           // Log.d("TIME: ", "Calendar from Saving the note: " + calendarDate);
 
             StyleableToast.makeText(this, "New Note added", Toast.LENGTH_SHORT, R.style.saveNoteToast).show();
         } else if (requestCode == EDIT_NOTE_REQUEST && resultCode == RESULT_OK) {
@@ -346,13 +361,15 @@ public class MainActivity extends AppCompatActivity {
 
             //Get the date string
             String dateUpdate = data.getStringExtra(EXTRA_DATE);
-            Log.d("TIME: ", "Date String to be updated from AddEditActivity: " + date);
+            Log.d("TIME:", "Date String to be updated from AddEditActivity: " + dateUpdate);
+            String dateUpdateText = data.getStringExtra(EXTRA_DATE_TEXT);
+            Log.d(TAG, "Date Text to be updated from AddEditActivity: " + dateUpdateText);
 
             Date date1 = new Date();
             Calendar calendarDateUpdate = Calendar.getInstance();
             //check if there is a date
             if (dateUpdate != null) {
-                Log.d("TIME: ", "Date is not null");
+                Log.d("TIME:", "Date is not null");
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'S'");
                 try {
                     date1 = (Date) simpleDateFormat.parse(dateUpdate);
@@ -367,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
             }
             Log.d("TIME", "Date value updated: " + date1);
 
-//            Create a new note
+            //Create a new note
             Note note = new Note(title, description, date1, reminderBoolean);
             note.setId(id);
             noteViewModel.update(note);
@@ -378,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("TIME: ", "Updated note id: " + id);
 
             //createReminder(calendarDate, date, id, reminderBoolean);
-            createReminder(calendarDateUpdate, dateUpdate, id, reminderBoolean, title, description);
+            createReminder(calendarDateUpdate, dateUpdateText, id, reminderBoolean, title, description);
 
             StyleableToast.makeText(this, "Note Updated", Toast.LENGTH_SHORT, R.style.saveNoteToast).show();
         }
