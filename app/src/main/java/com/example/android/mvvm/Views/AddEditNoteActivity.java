@@ -347,6 +347,15 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
             super.onBackPressed();
         }
     }
+    //BottomSheetDialog
+    @Override
+    public void onButtonClicked(String text) {
+        if (text.equals("Save")) {
+            saveNote();
+        } else if (text.equals("Cancel")) {
+            finish();
+        }
+    }
 
     private boolean checkIfIsEmpty() {
         //Get the values from the views
@@ -356,15 +365,6 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         //Check if title and description fields are empty
         //trim removes the empty spaces before and after the word
         return title.trim().isEmpty() || description.trim().isEmpty();
-    }
-
-    @Override
-    public void onButtonClicked(String text) {
-        if (text.equals("Save")) {
-            saveNote();
-        } else if (text.equals("Cancel")) {
-            finish();
-        }
     }
 
     //Returns the time set in the dialog

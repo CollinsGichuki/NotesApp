@@ -48,4 +48,7 @@
     <string name="description_text">Description</string>
     <string name="title_text">Title</string>
     <string name="reminder_icon">reminder_icon</string>
+    <string name="save_your_changes_or_discard_them">Save your changes or discard them?</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
 </resources>

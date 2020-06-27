@@ -375,6 +375,8 @@ public class MainActivity extends AppCompatActivity {
                     date1 = (Date) simpleDateFormat.parse(dateUpdate);
                     Log.d("TIME", "Date value is parsed");
                     calendarDateUpdate.setTime(date1);
+                    Log.d(TAG, "Calendar value: " + calendarDateUpdate);
+                    Log.d(TAG, "Calendar value: " + calendarDateUpdate.getTime());
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

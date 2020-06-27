@@ -18,6 +18,7 @@ import com.example.android.mvvm.R;
 import com.example.android.mvvm.ViewModel.NoteViewModel;
 import com.example.android.mvvm.ViewModel.NoteViewModelFactory;
 import com.example.android.mvvm.Views.AddEditNoteActivity;
+import com.example.android.mvvm.Views.MainActivity;
 
 import java.util.Calendar;
 
@@ -33,13 +34,15 @@ public class AlertReceiver extends BroadcastReceiver {
     private static final String NOTIFICATION_CHANNEL_ID = "primary_channel_id";
     private static final int NOTIFICATION_ID = 2;
     private NotificationManager fNotificationManager;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         fNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Log.d("TIME: ", "Alert received");
+        Log.d("TIME: ", "Alert received at " + Calendar.getInstance().getTime());
         String title = intent.getStringExtra(NOTIFICATION_TITLE_ID);
         String desc = intent.getStringExtra(NOTIFICATION_DESC_ID);
-        String time = intent.getStringExtra(NOTIFICATION_TIME_ID);
+       // String time = intent.getStringExtra(NOTIFICATION_TIME_ID);
+        String time = Calendar.getInstance().getTime().toString();
         int id = intent.getIntExtra(NOTIFICATION_NOTE_ID, -1);
         boolean reminderBoolean = intent.getBooleanExtra(NOTIFICATION_TIME_BOOLEAN_ID, false);
         //Update the Note
@@ -65,22 +68,9 @@ public class AlertReceiver extends BroadcastReceiver {
                 .setAutoCancel(true)//Dismiss the notification when tapped
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_ALARM);
-        //Launch EditNoteActivity when notification is clicked
-        Intent editActivityIntent = new Intent(context.getApplicationContext(), AddEditNoteActivity.class);
-        //Add the data to display the note
-        editActivityIntent.putExtra(AddEditNoteActivity.EXTRA_ID, id);
-        editActivityIntent.putExtra(AddEditNoteActivity.EXTRA_TITLE, title);
-        editActivityIntent.putExtra(AddEditNoteActivity.EXTRA_DESCRIPTION, desc);
-        editActivityIntent.putExtra(AddEditNoteActivity.EXTRA_DATE, time);
-        //Reminder Boolean should be false when reminder notification is run
-        editActivityIntent.putExtra(AddEditNoteActivity.EXTRA_REMINDER_BOOLEAN, false);
-
-        // Create the TaskStackBuilder and add the intent, which inflates the back stack
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context.getApplicationContext());
-        stackBuilder.addNextIntentWithParentStack(editActivityIntent);
-        // Get the PendingIntent containing the entire back stack
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        //Launch MainActivity when notification is clicked
+        Intent editActivityIntent = new Intent(context.getApplicationContext(), MainActivity.class);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, editActivityIntent, 0);
         builder.setContentIntent(resultPendingIntent);
 
         //Display the notification
@@ -88,6 +78,5 @@ public class AlertReceiver extends BroadcastReceiver {
         Calendar calendar = Calendar.getInstance();
         Log.d("TIME:", "Notification created at " + calendar.getTime());
         Log.d("TIME:", "Date String Notification created with " + time);
-        Log.d("TIME:", "Notification ID " + id);
     }
 }
