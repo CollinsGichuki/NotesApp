@@ -13,6 +13,8 @@
         //Animations for the whole app
         <item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>
 
+        <item name="bottomSheetDialogTheme">@style/CustomBottomDialog</item>
+
     </style>
     //ActionBar
     <style name="MyActionBarStyle" parent="Theme.AppCompat.DayNight.DarkActionBar">
@@ -21,7 +23,7 @@
     </style>
 
     //Style for the bottomSheetDialogFragment
-    <style name="CustomBottomDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
+    <style name="CustomBottomDialog" parent="Theme.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
     </style>
     
@@ -36,6 +38,7 @@
         <item name="cornerSizeBottomRight">0dp</item>
         <item name="cornerSizeBottomLeft">0dp</item>
     </style>
+
     //Style for the toast messages
     <style name="saveNoteToast">
         <item name="stTextBold">true</item>
