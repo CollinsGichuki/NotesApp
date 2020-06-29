@@ -9,13 +9,17 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.android.mvvm.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class EditNoteBottomSheetDialog extends BottomSheetDialogFragment {
+    public static final String TAG = "EditNoteBottomSheetDialog";
     private BottomSheetListener fListener;
+
+    public static EditNoteBottomSheetDialog newInstance(){
+        return new EditNoteBottomSheetDialog();
+    }
 
     //Override onCreate with our bottom sheet dialog view
     @Nullable

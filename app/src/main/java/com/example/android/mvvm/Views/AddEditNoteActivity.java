@@ -13,6 +13,7 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -20,11 +21,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.android.mvvm.R;
 import com.example.android.mvvm.Reminder.DatePickerFragment;
 import com.example.android.mvvm.Reminder.TimePickerFragment;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.muddzdev.styleabletoast.StyleableToast;
 
 import java.text.DateFormat;
@@ -85,6 +88,8 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
 
         Switch alarmToggle =  findViewById(R.id.alarm_toggle);
 
+        TextView reminderText = findViewById(R.id.bottom_sheet_textView);
+
         //Setting the title of the action bar
         //Get the id of the note from the intent that started this activity if we are editing the note
         Intent intent = getIntent();
@@ -134,7 +139,6 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
                         dateSelected = currentDay + ", " + DateFormat.getDateInstance().format(calendarDate.getTime());
 
                         //Set the text to edit reminder and set the toggle to checked
-                        TextView reminderText = findViewById(R.id.bottom_sheet_textView);
                         reminderText.setText(R.string.edit_reminder_text);
 
                         alarmToggle.setChecked(true);
@@ -149,6 +153,23 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         } else {
             setTitle("Add Note");
         }
+        //Reminder Nested ScrollView scroll up and down
+        final BottomSheetBehavior sheetBehavior;
+        final NestedScrollView reminderScrollView = findViewById(R.id.reminder_nested_scroll_view);
+        sheetBehavior = BottomSheetBehavior.from(reminderScrollView);
+
+        //Show the bottom sheet
+        reminderText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("Scroll", "ScrollView clicked");
+                if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED){
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                } else{
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
 
         //The reminder buttons
         ImageButton pickDate = findViewById(R.id.pick_date);

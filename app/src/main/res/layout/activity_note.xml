@@ -46,6 +46,7 @@
     </ScrollView>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/reminder_nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_behavior="@string/bottom_sheet_behavior"
@@ -54,9 +55,9 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/bottom_sheet_textView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/add_reminder"
                 android:textSize="20sp"
