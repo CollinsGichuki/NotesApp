@@ -5,38 +5,14 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorSecondary</item>
         <item name="colorSecondary">#004d40</item>
         <item name="colorSecondaryVariant">#00251a</item>
 
-        <item name="android:actionBarTabStyle">@style/MyActionBarStyle</item>
         //Animations for the whole app
         <item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>
 
-        <item name="bottomSheetDialogTheme">@style/CustomBottomDialog</item>
+        <item name="bottomSheetDialogTheme">@style/Theme.MaterialComponents.DayNight.BottomSheetDialog</item>
 
-    </style>
-    //ActionBar
-    <style name="MyActionBarStyle" parent="Theme.AppCompat.DayNight.DarkActionBar">
-        <item name="android:textColor">@android:color/white</item>
-
-    </style>
-
-    //Style for the bottomSheetDialogFragment
-    <style name="CustomBottomDialog" parent="Theme.MaterialComponents.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
-    </style>
-    
-    <style name="CustomBottomSheet" parent="Widget.MaterialComponents.BottomSheet">
-        <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
-    </style>
-
-    <style name="CustomShapeAppearanceBottomSheetDialog" parent="">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSizeTopRight">16dp</item>
-        <item name="cornerSizeTopLeft">16dp</item>
-        <item name="cornerSizeBottomRight">0dp</item>
-        <item name="cornerSizeBottomLeft">0dp</item>
     </style>
 
     //Style for the toast messages
