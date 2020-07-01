@@ -17,13 +17,14 @@ import java.sql.Time;
 import java.util.Calendar;
 
 public class TimePickerFragment extends DialogFragment {
+    //Get the current time
+    Calendar calendar = Calendar.getInstance();
+    int hour = calendar.get(Calendar.HOUR_OF_DAY);
+    int minute = calendar.get(Calendar.MINUTE);
+
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        //Get the current time
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.time_picker, null);
@@ -34,6 +35,8 @@ public class TimePickerFragment extends DialogFragment {
         TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), 3, (TimePickerDialog.OnTimeSetListener)getActivity(),
                 hour, minute, DateFormat.is24HourFormat(getActivity()));
         //timePickerDialog.setView(view);
-        return timePickerDialog;
+
+        return new TimePickerDialog(getActivity(),  (TimePickerDialog.OnTimeSetListener)getActivity(),
+                hour, minute, DateFormat.is24HourFormat(getActivity()));
     }
 }

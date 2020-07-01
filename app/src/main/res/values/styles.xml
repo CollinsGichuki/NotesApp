@@ -5,13 +5,15 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorSecondary">#004d40</item>
-        <item name="colorSecondaryVariant">#00251a</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="errorTextColor">@color/error</item>
 
         //Animations for the whole app
         <item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>
 
         <item name="bottomSheetDialogTheme">@style/Theme.MaterialComponents.DayNight.BottomSheetDialog</item>
+
 
     </style>
 
@@ -20,7 +22,7 @@
         <item name="stTextBold">true</item>
         <item name="stTextColor">#fff</item>
         <item name="stTextSize">14sp</item>
-        <item name="stColorBackground">@color/colorSecondary</item>
+        <item name="stColorBackground">@color/colorPrimaryDark</item>
         <item name="stSolidBackground">true</item>
         <item name="stStrokeWidth">3dp</item>
         <item name="stStrokeColor">#fff</item>
@@ -33,7 +35,7 @@
         <item name="stTextBold">true</item>
         <item name="stTextColor">#fff</item>
         <item name="stTextSize">14sp</item>
-        <item name="stColorBackground">@color/colorSecondary</item>
+        <item name="stColorBackground">@color/colorPrimaryDark</item>
         <item name="stSolidBackground">true</item>
         <item name="stStrokeWidth">3dp</item>
         <item name="stStrokeColor">#fff</item>
@@ -45,7 +47,18 @@
         <item name="stTextBold">true</item>
         <item name="stTextColor">#fff</item>
         <item name="stTextSize">14sp</item>
-        <item name="stColorBackground">@color/colorSecondary</item>
+        <item name="stColorBackground">@color/colorPrimaryDark</item>
+        <item name="stSolidBackground">true</item>
+        <item name="stStrokeWidth">3dp</item>
+        <item name="stStrokeColor">#fff</item>
+        <item name="stLength">LONG</item> LONG or SHORT
+        <item name="stRadius">5dp</item>
+    </style>
+    <style name="errorToast">
+        <item name="stTextBold">true</item>
+        <item name="stTextColor">#fff</item>
+        <item name="stTextSize">14sp</item>
+        <item name="stColorBackground">@color/error</item>
         <item name="stSolidBackground">true</item>
         <item name="stStrokeWidth">3dp</item>
         <item name="stStrokeColor">#fff</item>
@@ -60,6 +73,5 @@
         <item name="android:activityCloseEnterAnimation">@anim/slide_in_left</item>
         <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
     </style>
-
 
 </resources>

@@ -13,7 +13,6 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -82,6 +81,10 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         //Note Title and Description Edits
         titleEditText = findViewById(R.id.edit_text_title);
         descriptionEditText = findViewById(R.id.edit_text_description);
+
+        //Time and Date TextViews
+        timeTextView = findViewById(R.id.reminder_time_textView);
+        dateTextView = findViewById(R.id.reminder_date_textView);
 
         fCalendar = Calendar.getInstance();
         simpleDayFormat = new SimpleDateFormat("EEEE");
@@ -153,6 +156,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         } else {
             setTitle("Add Note");
         }
+
         //Reminder Nested ScrollView scroll up and down
         final BottomSheetBehavior sheetBehavior;
         final NestedScrollView reminderScrollView = findViewById(R.id.reminder_nested_scroll_view);
@@ -172,8 +176,8 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         });
 
         //The reminder buttons
-        ImageButton pickDate = findViewById(R.id.pick_date);
-        ImageButton pickTime = findViewById(R.id.pick_time);
+        final ImageButton pickDate = findViewById(R.id.pick_date);
+        final ImageButton pickTime = findViewById(R.id.pick_time);
 
         alarmToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -196,25 +200,48 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         pickDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogFragment datePicker = new DatePickerFragment();
-                datePicker.show(getSupportFragmentManager(), "date picker");
+                createCalendarDialog();
             }
         });
         pickTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogFragment timePicker = new TimePickerFragment();
-                timePicker.show(getSupportFragmentManager(), "time picker");
+                createClockDialog();
+
             }
         });
-        //Set the time and date texts
-        timeTextView = findViewById(R.id.reminder_time_textView);
-        dateTextView = findViewById(R.id.reminder_date_textView);
+
+        //Clicking the textViews should display the time and calendar dialogs respectively
+        timeTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createClockDialog();
+            }
+        });
+
+        dateTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createCalendarDialog();
+            }
+        });
+
         //Set the time and date Texts
         timeTextView.setText(timeSelected);
         dateTextView.setText(dateSelected);
 
     }//End of onCreate
+
+    private void createClockDialog() {
+        DialogFragment timePicker = new TimePickerFragment();
+        timePicker.show(getSupportFragmentManager(), "time picker");
+    }
+
+    private void createCalendarDialog() {
+        DialogFragment datePicker = new DatePickerFragment();
+        datePicker.setAllowEnterTransitionOverlap(true);
+        datePicker.show(getSupportFragmentManager(), "date picker");
+    }
 
 
     private void saveNote() {
@@ -323,7 +350,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
             Log.d(TAG, "remainderBoolean: " + editActivityBoolean);
         } else {
             Log.d(TAG, "remainderBoolean: " + editActivityBoolean);
-            StyleableToast.makeText(this, "Please select a date or time first", Toast.LENGTH_SHORT, R.style.plainToast).show();
+            StyleableToast.makeText(this, "Please select a date or time first", Toast.LENGTH_SHORT, R.style.errorToast).show();
         }
     }
 

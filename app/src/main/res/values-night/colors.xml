@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6b433a</color>
+    <color name="colorPrimaryDark">#3e1b14</color>
+    <color name="colorSecondary">#9b6e64</color>
+    <color name="colorAccent">#cd9c92</color>
+    <color name="selectedItem">#fff</color>
+    <color name="colorBackground">#323131</color>
+    <color name="iconTint">#fff</color>
+    <color name="onPrimary">#fff</color>
+    <color name="error">#CF6679</color>
+</resources>

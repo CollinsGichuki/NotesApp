@@ -349,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
                 id = idFromEdit;
                 Log.d("TIME: ", "Note ID: " + id);
             } else if (id == -1) {
-                StyleableToast.makeText(this, "Note can't be updated", Toast.LENGTH_SHORT, R.style.noteNotSavedToast).show();
+                StyleableToast.makeText(this, "Note can't be updated", Toast.LENGTH_SHORT, R.style.errorToast).show();
                 return;//leave the if statement
             }
 
