@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Views.AddEditNoteActivity"
-    android:background="@color/colorBackground">
+    android:background="?android:colorBackground">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -17,6 +17,16 @@
             android:layout_height="wrap_content"
             android:padding="16dp">
 
+            <TextView
+                android:id="@+id/note_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/un_categorized"
+                android:padding="5sp"
+                android:textColor="@color/colorSecondary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
             <EditText
                 android:id="@+id/edit_text_title"
                 android:layout_width="match_parent"
@@ -27,7 +37,7 @@
                 android:padding="10dp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/note_category" />
 
             <EditText
                 android:id="@+id/edit_text_description"
@@ -53,7 +63,7 @@
         app:layout_behavior="@string/bottom_sheet_behavior"
         app:behavior_hideable="false"
         app:behavior_peekHeight="50dp"
-        android:background="@color/colorBackground">
+        android:background="?android:colorBackground">
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

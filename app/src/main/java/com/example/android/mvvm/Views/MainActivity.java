@@ -56,6 +56,7 @@ import java.util.List;
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 import static com.example.android.mvvm.Repository.NoteRepository.noteId;
+import static com.example.android.mvvm.Views.AddEditNoteActivity.EXTRA_CATEGORY;
 import static com.example.android.mvvm.Views.AddEditNoteActivity.EXTRA_DATE_TEXT;
 import static com.example.android.mvvm.Views.AddEditNoteActivity.EXTRA_REMINDER_BOOLEAN;
 import static com.example.android.mvvm.Views.AddEditNoteActivity.EXTRA_DATE;
@@ -74,15 +75,15 @@ public class MainActivity extends AppCompatActivity {
     public static final String NOTIFICATION_NOTE_ID = "Notification_NOTE";
     public static final String NOTIFICATION_TIME_ID = "Notification_TIME";
     public static final String NOTIFICATION_TIME_BOOLEAN_ID = "Notification_TIME";
+    public static final String NOTIFICATION_CATEGORY = "Notification.CATEGORY";
 
     private Runnable runnable;
 
     private Calendar calendarDate;
-    private String date;
     private String title;
     private String description;
-    private boolean reminderBoolean;
-    public String dateText;
+    private String dateText;
+    private String category;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
             public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 //Use a library to draw the background icon, color and text
                 new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                        .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.colorPrimaryDark))
+                        .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.colorSecondary))
                         .addSwipeLeftActionIcon(R.drawable.ic_delete)
                         .create()
                         .decorate();
@@ -203,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, AddEditNoteActivity.class);
                 //Send the note details
                 //Db needs a primary key, the note ID
+                intent.putExtra(EXTRA_CATEGORY, note.getCategory());
                 intent.putExtra(AddEditNoteActivity.EXTRA_ID, note.getId());
                 intent.putExtra(AddEditNoteActivity.EXTRA_TITLE, note.getTitle());
                 intent.putExtra(AddEditNoteActivity.EXTRA_DESCRIPTION, note.getDescription());
@@ -236,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("TIME: ", "Background Thread 2 idInt: " + noteIntId);
                 Log.d("TIME: ", "Background thread finished");
                 //Call createReminder
-                createReminder(calendarDate, dateText, noteIntId, reminderBoolean, title, description);
+                createReminder(category, calendarDate, dateText, noteIntId, title, description);
             }
         };
 
@@ -258,20 +260,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void createReminder(Calendar calendar, String date, int id, boolean reminderBoolean, String title, String description) {
+    private void createReminder(String category, Calendar calendar, String date, int id, String title, String description) {
         if (date != null) {
             //Intent for the AlertReceiver Class
             Intent intent = new Intent(this.getApplicationContext(), AlertReceiver.class);
+            intent.putExtra(NOTIFICATION_CATEGORY, category);
             intent.putExtra(NOTIFICATION_TITLE_ID, title);
             intent.putExtra(NOTIFICATION_DESC_ID, description);
-            intent.putExtra(NOTIFICATION_TIME_BOOLEAN_ID, reminderBoolean);
             intent.putExtra(NOTIFICATION_TIME_ID, date);//Time to be displayed in the notification
             intent.putExtra(NOTIFICATION_NOTE_ID, id);
-            Log.d("TIME: ", "ID sent with Notification: " + id);
-            Log.d("TIME: ", "Title sent with Notification: " + title);
-            Log.d("TIME: ", "Desc sent with Notification: " + description);
-            Log.d("TIME: ", "Boolean sent with Notification: " + reminderBoolean);
-            Log.d("TIME: ", "Date sent with Notification: " + date);
 
             PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             //Set the alarm
@@ -288,22 +285,20 @@ public class MainActivity extends AppCompatActivity {
         //Find out which request we are handling(requestCode) and if we got a result back(resultCode
         if (requestCode == ADD_NOTE_REQUEST && resultCode == RESULT_OK) {
             //Extract the results sent over for the new note
+            category = data.getStringExtra(AddEditNoteActivity.EXTRA_CATEGORY);
             title = data.getStringExtra(AddEditNoteActivity.EXTRA_TITLE);
             description = data.getStringExtra(AddEditNoteActivity.EXTRA_DESCRIPTION);
-            reminderBoolean = data.getBooleanExtra(AddEditNoteActivity.EXTRA_REMINDER_BOOLEAN, false);
+            boolean reminderBoolean = data.getBooleanExtra(AddEditNoteActivity.EXTRA_REMINDER_BOOLEAN, false);
 
             //Get the date string
-            date = data.getStringExtra(EXTRA_DATE);
+            String date = data.getStringExtra(EXTRA_DATE);
             //Get the date Text
             dateText = data.getStringExtra(EXTRA_DATE_TEXT);
-            Log.d("TIME: ", "Date String to be stored from AddEditActivity: " + date);
-            Log.d("TIME: ", "Date Text to be stored from AddEditActivity: " + dateText);
 
             Date date1 = new Date();
 
             //check if there is a date
             if (date != null) {
-                Log.d("TIME: ", "Date is not null");
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'S'");
                 try {
                     date1 = (Date) simpleDateFormat.parse(date);
@@ -322,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
 
             //Create a new note
             //Note saves the reminder as a date
-            Note note = new Note(title, description, date1, reminderBoolean);
+            Note note = new Note(category, title, description, date1, reminderBoolean);
             noteViewModel.insert(note);
 
             //Start a background thread and read the value of the live data ID value
@@ -354,6 +349,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             //Extract the results sent over
+            String category = data.getStringExtra(EXTRA_CATEGORY);
             String title = data.getStringExtra(AddEditNoteActivity.EXTRA_TITLE);
             String description = data.getStringExtra(AddEditNoteActivity.EXTRA_DESCRIPTION);
             boolean reminderBoolean = data.getBooleanExtra(AddEditNoteActivity.EXTRA_REMINDER_BOOLEAN, false);
@@ -387,7 +383,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("TIME", "Date value updated: " + date1);
 
             //Create a new note
-            Note note = new Note(title, description, date1, reminderBoolean);
+            Note note = new Note(category, title, description, date1, reminderBoolean);
             note.setId(id);
             noteViewModel.update(note);
 
@@ -397,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("TIME: ", "Updated note id: " + id);
 
             //createReminder(calendarDate, date, id, reminderBoolean);
-            createReminder(calendarDateUpdate, dateUpdateText, id, reminderBoolean, title, description);
+            createReminder(category, calendarDateUpdate, dateUpdateText, id, title, description);
 
             StyleableToast.makeText(this, "Note Updated", Toast.LENGTH_SHORT, R.style.saveNoteToast).show();
         }

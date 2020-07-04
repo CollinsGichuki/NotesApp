@@ -41,7 +41,7 @@ public class NoteAdapter extends ListAdapter<Note, NoteAdapter.NoteHolder> {
         @Override
         public boolean areContentsTheSame(@NonNull Note oldItem, @NonNull Note newItem) {
             //Return true is none of the items have changed(same title,description and priority)
-            return oldItem.getTitle().equals(newItem.getTitle()) &&
+            return oldItem.getCategory().equals(newItem.getCategory()) && oldItem.getTitle().equals(newItem.getTitle()) &&
                     oldItem.getDescription().equals(newItem.getDescription());
         }
     };
@@ -59,6 +59,7 @@ public class NoteAdapter extends ListAdapter<Note, NoteAdapter.NoteHolder> {
     //Binds the data from the Note object to the Views
     public void onBindViewHolder(@NonNull final NoteHolder holder, int position) {
         Note currentNotes = getItem(position);
+        holder.textViewCategory.setText(currentNotes.getCategory());
         holder.textViewTitle.setText(currentNotes.getTitle());
         holder.textViewDescription.setText(currentNotes.getDescription());
 
@@ -78,12 +79,14 @@ public class NoteAdapter extends ListAdapter<Note, NoteAdapter.NoteHolder> {
 
     class NoteHolder extends RecyclerView.ViewHolder {
         //Our Views
+        private TextView textViewCategory;
         private TextView textViewTitle;
         private TextView textViewDescription;
         private ImageView reminderIcon;
 
         public NoteHolder(@NonNull View itemView) {
             super(itemView);
+            textViewCategory = itemView.findViewById(R.id.category_tv);
             textViewTitle = itemView.findViewById(R.id.text_view_title);
             textViewDescription = itemView.findViewById(R.id.text_view_description);
             reminderIcon = itemView.findViewById(R.id.notification_icon);

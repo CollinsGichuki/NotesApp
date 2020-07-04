@@ -1,9 +1,12 @@
 package com.example.android.mvvm.Views;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -43,10 +46,14 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
     public static final String EXTRA_REMINDER_BOOLEAN = "com.example.android.mvvm.EXTRA_REMINDER_BOOLEAN";
     public static final String EXTRA_DATE = "com.example.android.mvvm.EXTRA_REMINDER_DATE";
     public static final String EXTRA_DATE_TEXT = "com.example.android.mvvm.EXTRA_REMINDER_DATE_STRING";
+    public static final String EXTRA_CATEGORY = "com.example.android.mvvm.EXTRA_CATEGORY";
 
     public static final String SELECT_DATE_TEXT = "Select Date";
     public static final String SELECT_TIME_TEXT = "Select Time";
     public final String TAG = "TIME:";
+
+    private TextView categoryTextView;
+    private String categoryString = "Un-Categorized";
 
     private EditText titleEditText;
     private EditText descriptionEditText;
@@ -78,6 +85,8 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
 
         Log.d(TAG + " ", "AddEditActivity launched");
 
+        categoryTextView = findViewById(R.id.note_category);
+
         //Note Title and Description Edits
         titleEditText = findViewById(R.id.edit_text_title);
         descriptionEditText = findViewById(R.id.edit_text_description);
@@ -89,7 +98,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         fCalendar = Calendar.getInstance();
         simpleDayFormat = new SimpleDateFormat("EEEE");
 
-        Switch alarmToggle =  findViewById(R.id.alarm_toggle);
+        Switch alarmToggle = findViewById(R.id.alarm_toggle);
 
         TextView reminderText = findViewById(R.id.bottom_sheet_textView);
 
@@ -104,6 +113,10 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
             reminderBooleanFromMainActivity = intent.getBooleanExtra(EXTRA_REMINDER_BOOLEAN, false);
             dateFromIntent = intent.getStringExtra(EXTRA_DATE);
             dateTextFromIntent = intent.getStringExtra(EXTRA_DATE_TEXT);
+
+            //Get the category from the intent
+            categoryString = intent.getStringExtra(EXTRA_CATEGORY);
+            categoryTextView.setText(categoryString);
 
             //Get the date and time from date
             if (dateFromIntent != null && intent.getIntExtra(EXTRA_ID, -1) != -1) {
@@ -156,6 +169,12 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         } else {
             setTitle("Add Note");
         }
+        //Click category textView to set the category
+        categoryTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {                createCategoryDialog();
+            }
+        });
 
         //Reminder Nested ScrollView scroll up and down
         final BottomSheetBehavior sheetBehavior;
@@ -167,9 +186,9 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
             @Override
             public void onClick(View v) {
                 Log.d("Scroll", "ScrollView clicked");
-                if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED){
+                if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
                     sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                } else{
+                } else {
                     sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
             }
@@ -189,7 +208,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
                         setRemainder();
                     } else {
                         buttonView.setChecked(false);
-                        StyleableToast.makeText(AddEditNoteActivity.this, "Please select a date or time first", Toast.LENGTH_SHORT, R.style.plainToast).show();
+                        StyleableToast.makeText(AddEditNoteActivity.this, "Please select a date or time first", Toast.LENGTH_SHORT, R.style.errorToast).show();
                     }
                 } else {
                     cancelRemainder();
@@ -232,6 +251,32 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
 
     }//End of onCreate
 
+    private void createCategoryDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Set Category");
+        // Set up the input
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        builder.setView(input);
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                categoryString = input.getText().toString();
+                categoryTextView.setText(categoryString);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
     private void createClockDialog() {
         DialogFragment timePicker = new TimePickerFragment();
         timePicker.show(getSupportFragmentManager(), "time picker");
@@ -252,7 +297,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         //Check if title and description fields are empty
         //trim removes the empty spaces before and after the word
         if (title.trim().isEmpty() || description.trim().isEmpty()) {
-            StyleableToast.makeText(this, "Please insert a title and description", Toast.LENGTH_SHORT, R.style.plainToast).show();
+            StyleableToast.makeText(this, "Please insert a title and description", Toast.LENGTH_SHORT, R.style.errorToast).show();
             return;
         }
         //Pass the data from the note to the MainActivity
@@ -260,6 +305,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         data.putExtra(EXTRA_TITLE, title);
         data.putExtra(EXTRA_DESCRIPTION, description);
         data.putExtra(EXTRA_REMINDER_BOOLEAN, editActivityBoolean);
+        data.putExtra(EXTRA_CATEGORY, categoryString);
         Log.d(TAG + " ", "ReminderBoolean: " + editActivityBoolean);
 
         //If we are saving a note that we have edited
@@ -288,16 +334,16 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
                 //Check if it had a reminder from MainActivity
                 if (reminderBooleanFromMainActivity) {
                     //Check if the updated note has an updated date
-                    if (dateTimeSet){
+                    if (dateTimeSet) {
                         //Use the updated date
                         data.putExtra(EXTRA_DATE, dateToBeSavedNew);
                         data.putExtra(EXTRA_DATE_TEXT, dateToBeSavedText);
-                        Log.d(TAG , "Updated Note with updated data: " + dateToBeSavedNew);
+                        Log.d(TAG, "Updated Note with updated data: " + dateToBeSavedNew);
                     } else {
                         //Use date from intent
                         data.putExtra(EXTRA_DATE, dateFromIntent);
                         data.putExtra(EXTRA_DATE_TEXT, dateTextFromIntent);
-                        Log.d(TAG , "Updated Note with date from Intent: " + dateFromIntent);
+                        Log.d(TAG, "Updated Note with date from Intent: " + dateFromIntent);
                     }
                     //Include the id from the intent
                     data.putExtra(EXTRA_ID, id);
@@ -307,13 +353,13 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
                     data.putExtra(EXTRA_ID, id);
                     data.putExtra(EXTRA_DATE, dateToBeSavedNew);
                     data.putExtra(EXTRA_DATE_TEXT, dateToBeSavedText);
-                    Log.d(TAG , "Updated Note dateNew with first reminder " + dateToBeSavedNew);
-                    Log.d(TAG , "Updated Note date text with first reminder " + dateToBeSavedText);
+                    Log.d(TAG, "Updated Note dateNew with first reminder " + dateToBeSavedNew);
+                    Log.d(TAG, "Updated Note date text with first reminder " + dateToBeSavedText);
                 }
             } else {
                 //Note to be updated has no reminder
-               dateToBeSavedNew = null;
-               dateToBeSavedText = null;
+                dateToBeSavedNew = null;
+                dateToBeSavedText = null;
                 Log.d(TAG + " ", "Update without reminder: " + id);
                 data.putExtra(EXTRA_DATE, dateToBeSavedNew);
                 data.putExtra(EXTRA_DATE_TEXT, dateToBeSavedText);
@@ -395,6 +441,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
             super.onBackPressed();
         }
     }
+
     //BottomSheetDialog
     @Override
     public void onButtonClicked(String text) {

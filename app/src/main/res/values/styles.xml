@@ -14,7 +14,6 @@
 
         <item name="bottomSheetDialogTheme">@style/Theme.MaterialComponents.DayNight.BottomSheetDialog</item>
 
-
     </style>
 
     //Style for the toast messages
@@ -22,10 +21,8 @@
         <item name="stTextBold">true</item>
         <item name="stTextColor">#fff</item>
         <item name="stTextSize">14sp</item>
-        <item name="stColorBackground">@color/colorPrimaryDark</item>
+        <item name="stColorBackground">@color/colorPrimary</item>
         <item name="stSolidBackground">true</item>
-        <item name="stStrokeWidth">3dp</item>
-        <item name="stStrokeColor">#fff</item>
         <item name="stIconStart">@drawable/ic_check_box</item>
         <item name="stLength">LONG</item> LONG or SHORT
         <item name="stRadius">5dp</item>
@@ -35,10 +32,8 @@
         <item name="stTextBold">true</item>
         <item name="stTextColor">#fff</item>
         <item name="stTextSize">14sp</item>
-        <item name="stColorBackground">@color/colorPrimaryDark</item>
+        <item name="stColorBackground">@color/colorPrimary</item>
         <item name="stSolidBackground">true</item>
-        <item name="stStrokeWidth">3dp</item>
-        <item name="stStrokeColor">#fff</item>
         <item name="stIconStart">@drawable/ic_error</item>
         <item name="stLength">LONG</item> LONG or SHORT
         <item name="stRadius">5dp</item>
@@ -47,21 +42,17 @@
         <item name="stTextBold">true</item>
         <item name="stTextColor">#fff</item>
         <item name="stTextSize">14sp</item>
-        <item name="stColorBackground">@color/colorPrimaryDark</item>
+        <item name="stColorBackground">@color/colorPrimary</item>
         <item name="stSolidBackground">true</item>
-        <item name="stStrokeWidth">3dp</item>
-        <item name="stStrokeColor">#fff</item>
         <item name="stLength">LONG</item> LONG or SHORT
         <item name="stRadius">5dp</item>
     </style>
     <style name="errorToast">
         <item name="stTextBold">true</item>
-        <item name="stTextColor">#fff</item>
+        <item name="stTextColor">#000</item>
         <item name="stTextSize">14sp</item>
         <item name="stColorBackground">@color/error</item>
         <item name="stSolidBackground">true</item>
-        <item name="stStrokeWidth">3dp</item>
-        <item name="stStrokeColor">#fff</item>
         <item name="stLength">LONG</item> LONG or SHORT
         <item name="stRadius">5dp</item>
     </style>

@@ -14,7 +14,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 //The Database Class
 //Version Number is used when making changes to the database
-@Database(entities = Note.class, version = 2, exportSchema = false)
+@Database(entities = Note.class, version = 3, exportSchema = false)
 @TypeConverters({DateConverter.class})
 public abstract class NoteDatabase extends RoomDatabase {
     //Make the class to be a singleton/Can't be able to make multiple instances of the class
@@ -33,9 +33,8 @@ public abstract class NoteDatabase extends RoomDatabase {
             //roomCallback inserts data to the db when first created
             instance = Room.databaseBuilder(context.getApplicationContext(),
                     NoteDatabase.class, "note_database")
-                    //.addMigrations(MIGRATION_1_2)
-                    .fallbackToDestructiveMigration()
-                  //  .addCallback(roomCallback)
+                    .addMigrations(MIGRATION_2_3)
+                    //.fallbackToDestructiveMigration()
                     .build();
         }
         return instance;
@@ -64,37 +63,14 @@ public abstract class NoteDatabase extends RoomDatabase {
         }
     };
 
-    /*
-    To create the db with data in it(for testing purposes), we access the onCreate method
-    We populate the database using AsyncTask
-    */
-    private static RoomDatabase.Callback roomCallback = new RoomDatabase.Callback() {
+    //Added category
+    static final Migration MIGRATION_2_3 = new Migration(2, 3) {
         @Override
-        public void onCreate(@NonNull SupportSQLiteDatabase db) {
-            super.onCreate(db);
-            //Create the db wit data in it
-            new PopulateDbAsyncTask(instance).execute();
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            //Add the new item
+            database.execSQL("ALTER TABLE note_table"
+                    + " ADD COLUMN category TEXT");
         }
     };
 
-    /*
-     <<<<<<<<<THIS IS FOR TESTING WHETHER THE DB WORKS>>>>>>>>>>
-    */
-    private static class PopulateDbAsyncTask extends AsyncTask<Void, Void, Void> {
-        private NoteDao noteDao;
-
-        private PopulateDbAsyncTask(NoteDatabase db) {
-            noteDao = db.noteDao();
-        }
-
-        //Comment/ delete this out, if you don't want to have data pre inserted in the db
-        @Override
-        protected Void doInBackground(Void... voids) {
-//            noteDao.insert(new Note("Title 1", "Description 1", null, false));
-//            noteDao.insert(new Note("Title 2", "Description 2", null, false));
-//            noteDao.insert(new Note("Title 3", "Description 3", null, false));
-//            noteDao.insert(new Note("Title 4", "Description 4", null, false));
-            return null;
-        }
-    }
 }

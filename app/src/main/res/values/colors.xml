@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6b433a</color>
-    <color name="colorPrimaryDark">#3e1b14</color>
-    <color name="colorSecondary">#9b6e64</color>
-    <color name="colorAccent">#6b433a</color>
-    <color name="colorBackground">#fff</color>
+    <color name="colorPrimary">#5456EF</color>
+    <color name="colorPrimaryDark">#4143FB</color>
+    <color name="colorSecondary">#FF9800</color>
+    <color name="colorAccent">#FFC107</color>
+    <color name="colorBackground">@android:color/background_light</color>
+    <color name="colorCardBackground">@color/cardview_light_background</color>
     <color name="selectedItem">#000</color>
     <color name="iconTint">#000</color>
     <color name="onPrimary">#000</color>
     <color name="error">#B00020</color>
+
+    <color name="defaultNoteColor">#EB121212</color>
+    <color name="orangeNoteColor">#E1FF9800</color>
+    <color name="blueNoteColor">#E92196F3</color>
+    <color name="greenNoteColor">#4CAF50</color>
+    <color name="purpleNoteColor">#E2673AB7</color>
 </resources>

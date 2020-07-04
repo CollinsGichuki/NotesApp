@@ -23,6 +23,7 @@ import com.example.android.mvvm.Views.MainActivity;
 import java.util.Calendar;
 
 import static com.example.android.mvvm.Views.AddEditNoteActivity.EXTRA_DATE;
+import static com.example.android.mvvm.Views.MainActivity.NOTIFICATION_CATEGORY;
 import static com.example.android.mvvm.Views.MainActivity.NOTIFICATION_DESC_ID;
 import static com.example.android.mvvm.Views.MainActivity.NOTIFICATION_NOTE_ID;
 import static com.example.android.mvvm.Views.MainActivity.NOTIFICATION_TIME_BOOLEAN_ID;
@@ -38,32 +39,26 @@ public class AlertReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         fNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Log.d("TIME: ", "Alert received at " + Calendar.getInstance().getTime());
         String title = intent.getStringExtra(NOTIFICATION_TITLE_ID);
         String desc = intent.getStringExtra(NOTIFICATION_DESC_ID);
-       // String time = intent.getStringExtra(NOTIFICATION_TIME_ID);
-        String time = Calendar.getInstance().getTime().toString();
         int id = intent.getIntExtra(NOTIFICATION_NOTE_ID, -1);
-        boolean reminderBoolean = intent.getBooleanExtra(NOTIFICATION_TIME_BOOLEAN_ID, false);
-        //Update the Note
-        Note note = new Note(title, desc, null, false);
+        String category = intent.getStringExtra(NOTIFICATION_CATEGORY);
+
+        Note note = new Note(category, title, desc, null, false);
         note.setId(id);
         noteViewModel.update(note);
-        Log.d("TIME: ", "Note updated");
-        Log.d("TIME: ", "reminderBoolean received: " + reminderBoolean);
-        deliverNotification(context, title, desc, time, id);
+        deliverNotification(context, title, desc);
     }
 
-    private void deliverNotification(Context context, String title, String desc, String time, int id) {
+    private void deliverNotification(Context context, String title, String desc) {
         String notificationTitle = "Reminder: " + title;
-        String notificationBigText = desc + "\n" + "\n" + time;
         //Create a notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 context, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_subject)
                 .setContentTitle(notificationTitle)
                 .setContentText(desc)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationBigText))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(desc))
                 .setColor(context.getResources().getColor(R.color.colorPrimary))
                 .setAutoCancel(true)//Dismiss the notification when tapped
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -75,8 +70,5 @@ public class AlertReceiver extends BroadcastReceiver {
 
         //Display the notification
         fNotificationManager.notify(NOTIFICATION_ID, builder.build());
-        Calendar calendar = Calendar.getInstance();
-        Log.d("TIME:", "Notification created at " + calendar.getTime());
-        Log.d("TIME:", "Date String Notification created with " + time);
     }
 }

@@ -51,4 +51,8 @@
     <string name="save_your_changes_or_discard_them">Save your changes or discard them?</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
+    <string name="imageViewDesc">checkBox</string>
+    <string name="select_color">Select Color</string>
+    <string name="un_categorized">Un-Categorized</string>
+    <string name="category">Category</string>
 </resources>
