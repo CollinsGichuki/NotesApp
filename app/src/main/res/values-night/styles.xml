@@ -7,6 +7,16 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="errorTextColor">@color/error</item>
 
-        <item name="bottomSheetDialogTheme">@style/Theme.MaterialComponents.DayNight.BottomSheetDialog</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorSurface">@color/colorCardBackground</item>
+
+        <item name="bottomSheetDialogTheme">@style/bottomSheetDialogTheme</item>
+
+        <item name="android:navigationBarColor">#000000</item>
+    </style>
+
+    <style name="bottomSheetDialogTheme" parent="@style/Theme.MaterialComponents.DayNight.BottomSheetDialog">
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorSurface">@color/colorCardBackground</item>
     </style>
 </resources>

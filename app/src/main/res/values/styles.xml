@@ -9,11 +9,19 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="errorTextColor">@color/error</item>
 
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorSurface">@color/colorCardBackground</item>
+
         //Animations for the whole app
         <item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>
 
-        <item name="bottomSheetDialogTheme">@style/Theme.MaterialComponents.DayNight.BottomSheetDialog</item>
+        <item name="bottomSheetDialogTheme">@style/bottomSheetDialogTheme</item>
 
+    </style>
+
+    <style name="bottomSheetDialogTheme" parent="@style/Theme.MaterialComponents.DayNight.BottomSheetDialog">
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorSurface">@color/colorCardBackground</item>
     </style>
 
     //Style for the toast messages

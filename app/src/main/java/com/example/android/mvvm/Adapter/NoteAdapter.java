@@ -1,6 +1,5 @@
 package com.example.android.mvvm.Adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,18 +7,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.mvvm.Model.Note;
 import com.example.android.mvvm.R;
-import com.example.android.mvvm.Views.MainActivity;
 
 
 //We extend ListAdapter.RecyclerView which we will use to compare the lists and get a position(for animations)
@@ -32,17 +25,19 @@ public class NoteAdapter extends ListAdapter<Note, NoteAdapter.NoteHolder> {
     }
 
     private static final DiffUtil.ItemCallback<Note> DIFF_CALLBACK = new DiffUtil.ItemCallback<Note>() {
+
         @Override
         public boolean areItemsTheSame(@NonNull Note oldItem, @NonNull Note newItem) {
-            //Know if the items are the same
-            return oldItem.getId() == newItem.getId() && oldItem.isReminderBoolean() == newItem.isReminderBoolean();
+            //Know if the objects represent the same item
+            return oldItem.getId() == newItem.getId();
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull Note oldItem, @NonNull Note newItem) {
-            //Return true is none of the items have changed(same title,description and priority)
+            //Checks if the two items have the same data in them
+            //Return true is none of the items have changed(same title,description, priority and reminderBoolean)
             return oldItem.getCategory().equals(newItem.getCategory()) && oldItem.getTitle().equals(newItem.getTitle()) &&
-                    oldItem.getDescription().equals(newItem.getDescription());
+                    oldItem.getDescription().equals(newItem.getDescription()) && oldItem.isReminderBoolean() == newItem.isReminderBoolean();
         }
     };
 

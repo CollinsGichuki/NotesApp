@@ -3,7 +3,6 @@ package com.example.android.mvvm.BaseApplication;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
 

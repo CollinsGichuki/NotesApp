@@ -120,10 +120,10 @@ public class MainActivity extends AppCompatActivity {
                 super.onScrolled(recyclerView, dx, dy);
                 //dy is > 0 when user scrolls down
                 //Hide the fab when user scrolls down
-                //Show the fab when user scrolls up
+                //Show the fab when user scrolls up or screen is not being scrolled
                 if (dy > 0 && fab.getVisibility() == View.VISIBLE) {
                     fab.hide();
-                } else if (dy < 0 && fab.getVisibility() != View.VISIBLE) {
+                } else if (dy <= 0 && fab.getVisibility() != View.VISIBLE) {
                     fab.show();
                 }
             }
@@ -149,16 +149,18 @@ public class MainActivity extends AppCompatActivity {
         final Note[] note = {null};
 
         //Class that makes the recyclerView touchable
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+        //Removed the up and down dragdirs for onMove
+        // TODO: Implement up and down drag directions for onMove then redo the recyclerview to make it work
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 //Rearrange the items
                 int oldPosition = viewHolder.getAdapterPosition();
                 int newPosition = target.getAdapterPosition();
-                
-                noteAdapter.notifyItemMoved(oldPosition, newPosition);
-                return true;
+
+               // noteAdapter.notifyItemMoved(oldPosition, newPosition);
+                return false;
             }
 
             //Swipe Left to delete

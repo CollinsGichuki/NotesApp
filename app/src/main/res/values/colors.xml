@@ -6,6 +6,7 @@
     <color name="colorAccent">#FFC107</color>
     <color name="colorBackground">@android:color/background_light</color>
     <color name="colorCardBackground">@color/cardview_light_background</color>
+
     <color name="selectedItem">#000</color>
     <color name="iconTint">#000</color>
     <color name="onPrimary">#000</color>

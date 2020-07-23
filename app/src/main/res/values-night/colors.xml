@@ -5,8 +5,8 @@
     <color name="colorSecondary">#FF9800</color>
     <color name="colorAccent">#ffc947</color>
     <color name="selectedItem">#fff</color>
-    <color name="colorBackground">@android:color/background_dark</color>
-    <color name="colorCardBackground">@color/cardview_dark_background</color>
+    <color name="colorBackground">#000000</color>
+    <color name="colorCardBackground">#000000</color>
     <color name="iconTint">#fff</color>
     <color name="onPrimary">#fff</color>
     <color name="error">#CF6679</color>
