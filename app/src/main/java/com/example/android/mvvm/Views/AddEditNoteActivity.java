@@ -44,6 +44,7 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
     public static final String EXTRA_TITLE = "com.example.android.mvvm.EXTRA_TITLE";
     public static final String EXTRA_DESCRIPTION = "com.example.android.mvvm.EXTRA_DESCRIPTION";
     public static final String EXTRA_REMINDER_BOOLEAN = "com.example.android.mvvm.EXTRA_REMINDER_BOOLEAN";
+    public static final String EXTRA_REMINDER_CANCELLED_BOOLEAN = "com.example.android.mvvm.EXTRA_REMINDER_CANCELLED_BOOLEAN";
     public static final String EXTRA_DATE = "com.example.android.mvvm.EXTRA_REMINDER_DATE";
     public static final String EXTRA_DATE_TEXT = "com.example.android.mvvm.EXTRA_REMINDER_DATE_STRING";
     public static final String EXTRA_CATEGORY = "com.example.android.mvvm.EXTRA_CATEGORY";
@@ -75,6 +76,8 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
     private TextView dateTextView;
     private SimpleDateFormat simpleDayFormat;
     public Boolean dateTimeSet = false;
+
+    private Boolean reminderCancelled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -339,7 +342,6 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
 
         //If it is an edited note
         if (id != -1) {
-            Log.d(TAG + " ", "ID: is not -1: " + id);
             //Note to be updated has a reminder
             if (editActivityBoolean) {
                 //Check if it had a reminder from MainActivity
@@ -388,6 +390,9 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
             data.putExtra(EXTRA_DATE_TEXT, dateToBeSavedText);
             Log.d(TAG + " ", "New Note with a reminder: " + id);
             Log.d(TAG, "Date Object: " + date1);
+
+            //Add the reminder cancelled boolean
+            data.putExtra(EXTRA_REMINDER_CANCELLED_BOOLEAN, reminderCancelled);
         }
         Log.d(TAG, "HasReminder: " + editActivityBoolean);
         Log.d(TAG, "Date to be saved: " + dateToBeSavedNew);
@@ -412,6 +417,11 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
     }
 
     private void cancelRemainder() {
+        //Check if there was a reminder
+        if (reminderBooleanFromMainActivity){
+            //Cancel that reminder
+            reminderCancelled = true;
+        }
         //set the reminderBoolean to be false
         editActivityBoolean = false;
         //revert the textViews to the original texts
