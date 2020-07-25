@@ -85,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
     private String dateText;
     private String category;
 
+    private Intent reminderIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                 int oldPosition = viewHolder.getAdapterPosition();
                 int newPosition = target.getAdapterPosition();
 
-               // noteAdapter.notifyItemMoved(oldPosition, newPosition);
+                // noteAdapter.notifyItemMoved(oldPosition, newPosition);
                 return false;
             }
 
@@ -265,18 +267,26 @@ public class MainActivity extends AppCompatActivity {
     private void createReminder(String category, Calendar calendar, String date, int id, String title, String description) {
         if (date != null) {
             //Intent for the AlertReceiver Class
-            Intent intent = new Intent(this.getApplicationContext(), AlertReceiver.class);
-            intent.putExtra(NOTIFICATION_CATEGORY, category);
-            intent.putExtra(NOTIFICATION_TITLE_ID, title);
-            intent.putExtra(NOTIFICATION_DESC_ID, description);
-            intent.putExtra(NOTIFICATION_TIME_ID, date);//Time to be displayed in the notification
-            intent.putExtra(NOTIFICATION_NOTE_ID, id);
+            reminderIntent = new Intent(this.getApplicationContext(), AlertReceiver.class);
+            reminderIntent.putExtra(NOTIFICATION_CATEGORY, category);
+            reminderIntent.putExtra(NOTIFICATION_TITLE_ID, title);
+            reminderIntent.putExtra(NOTIFICATION_DESC_ID, description);
+            reminderIntent.putExtra(NOTIFICATION_TIME_ID, date);//Time to be displayed in the notification
+            reminderIntent.putExtra(NOTIFICATION_NOTE_ID, id);
 
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, id, reminderIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             //Set the alarm
             if (alarmManager != null) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
             }
+        }
+    }
+
+    private void cancelReminder(int id) {
+        if (alarmManager != null) {
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, id, reminderIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+            alarmManager.cancel(pendingIntent);
+            Log.d("Time: ", "Reminder cancelled");
         }
     }
 
@@ -332,7 +342,7 @@ public class MainActivity extends AppCompatActivity {
             // note for the note details
             // date to check if it is null
 
-           // Log.d("TIME: ", "Calendar from Saving the note: " + calendarDate);
+            // Log.d("TIME: ", "Calendar from Saving the note: " + calendarDate);
 
             StyleableToast.makeText(this, "New Note added", Toast.LENGTH_SHORT, R.style.saveNoteToast).show();
         } else if (requestCode == EDIT_NOTE_REQUEST && resultCode == RESULT_OK) {
@@ -355,6 +365,7 @@ public class MainActivity extends AppCompatActivity {
             String title = data.getStringExtra(AddEditNoteActivity.EXTRA_TITLE);
             String description = data.getStringExtra(AddEditNoteActivity.EXTRA_DESCRIPTION);
             boolean reminderBoolean = data.getBooleanExtra(AddEditNoteActivity.EXTRA_REMINDER_BOOLEAN, false);
+            boolean reminderCancelled = data.getBooleanExtra(AddEditNoteActivity.EXTRA_REMINDER_CANCELLED_BOOLEAN, false);
             //Set the Boolean value
 
             //Get the date string
@@ -366,7 +377,7 @@ public class MainActivity extends AppCompatActivity {
             Date date1 = new Date();
             Calendar calendarDateUpdate = Calendar.getInstance();
             //check if there is a date
-            if (dateUpdate != null) {
+            if (dateUpdate != null && !reminderCancelled) {
                 Log.d("TIME:", "Date is not null");
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'S'");
                 try {
@@ -379,7 +390,10 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             } else {
+                //Reminder is cancelled
                 date1 = null;
+                cancelReminder(id);
+                Log.d("Time: ", "Reminder cancelled called");
                 Log.d("TIME:: ", "Date is NULL");
             }
             Log.d("TIME", "Date value updated: " + date1);
