@@ -172,7 +172,8 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         //Click category textView to set the category
         categoryTextView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {                createCategoryDialog();
+            public void onClick(View v) {
+                createCategoryDialog();
             }
         });
 
@@ -258,6 +259,9 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 
+        //if there is a category, show it.
+        input.setText(categoryString);
+
         builder.setView(input);
         // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -296,9 +300,16 @@ public class AddEditNoteActivity extends AppCompatActivity implements EditNoteBo
 
         //Check if title and description fields are empty
         //trim removes the empty spaces before and after the word
-        if (title.trim().isEmpty() || description.trim().isEmpty()) {
-            StyleableToast.makeText(this, "Please insert a title and description", Toast.LENGTH_SHORT, R.style.errorToast).show();
-            return;
+        if (title.trim().isEmpty() && description.trim().isEmpty()) {
+            StyleableToast.makeText(this, "Please insert a title or description", Toast.LENGTH_SHORT, R.style.errorToast).show();
+            return;//Don't save the note, force the user to have a title or a description
+        } else if (title.trim().isEmpty()) {
+            //Set the title to be the first 20 characters from the description
+            if (description.length() < 20) {
+                title = description;
+            } else {
+                title = description.substring(0, 20);
+            }
         }
         //Pass the data from the note to the MainActivity
         Intent data = new Intent();
