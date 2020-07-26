@@ -389,7 +389,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-            } else {
+            } else if (dateUpdate != null && reminderCancelled){
                 //Reminder is cancelled
                 date1 = null;
                 cancelReminder(id);
